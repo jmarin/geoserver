@@ -67,29 +67,43 @@ public class HTMLOutputFormat extends WFSGetFeatureOutputFormat {
 
 		List<FeatureCollection> fcolls = featureCollection.getFeatures();
 		for (FeatureCollection fc : fcolls) {
-			FeatureIterator it = fc.features();
-			AttributeDescriptor attributeDescriptor;
-			while (it.hasNext()) {
-				SimpleFeature simpleFeature = (SimpleFeature) it.next();
-				SimpleFeatureType simpleFeatureType = simpleFeature.getType();
 
-				List<AttributeDescriptor> attributeDescriptors = simpleFeatureType
-						.getAttributeDescriptors();
-				int attributeCount = simpleFeature.getAttributeCount();
-				for (int i = 0; i < attributeCount; i++) {
-					Object attributeValue = simpleFeature.getAttribute(i);
-					if (attributeValue instanceof Geometry) {
+			try {
+				FeatureIterator it = fc.features();
+				AttributeDescriptor attributeDescriptor;
+				while (it.hasNext()) {
+					SimpleFeature simpleFeature = (SimpleFeature) it.next();
+					SimpleFeatureType simpleFeatureType = simpleFeature
+							.getType();
 
-					} else {
-						if (attributeValue != null) {
-							outWriter.write("<div>");
-							outWriter.write(attributeValue.toString());
-							outWriter.write("</div>");
-							System.out.println(attributeValue.toString());
+					List<AttributeDescriptor> attributeDescriptors = simpleFeatureType
+							.getAttributeDescriptors();
+					int attributeCount = simpleFeature.getAttributeCount();
+					for (int i = 0; i < attributeCount; i++) {
+						Object attributeValue = simpleFeature.getAttribute(i);
+						if (attributeValue instanceof Geometry) {
+
+						} else {
+							if (attributeValue != null) {
+								outWriter.write("<div>");
+								outWriter.write(attributeValue.toString());
+								outWriter.write("</div>");
+								System.out.println(attributeValue.toString());
+							}
 						}
 					}
 				}
+
+			} catch (Exception exception) {
+				ServiceException serviceException = new ServiceException(
+						"Error: " + exception.getMessage());
+				serviceException.initCause(exception);
+				throw serviceException;
+			} finally {
+				outWriter.write("");
+				outWriter.flush();
 			}
+
 		}
 
 	}
