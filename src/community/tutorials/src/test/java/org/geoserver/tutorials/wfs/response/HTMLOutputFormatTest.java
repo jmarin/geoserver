@@ -15,7 +15,7 @@ import org.opengis.feature.simple.SimpleFeature;
 /**
  * 
  * @author Juan Marin, OpenGeo
- *
+ * 
  */
 
 public class HTMLOutputFormatTest extends WFSTestSupport {
@@ -26,25 +26,21 @@ public class HTMLOutputFormatTest extends WFSTestSupport {
 
         // check the mime type
         assertEquals("text/html", resp.getContentType());
-        
-        
+
         FeatureSource fs = getFeatureSource(MockData.PRIMITIVEGEOFEATURE);
         System.out.println(fs.getFeatures().size());
-        
-        //check write operation
-        
-        
-        
+
+        // check write operation
+
         FeatureIterator it = fs.getFeatures().features();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             SimpleFeature f = (SimpleFeature) it.next();
             Collection values = f.getValue();
-//            for (Object value : values){
-//                System.out.println(value.toString());
-//            }
+            // for (Object value : values){
+            // System.out.println(value.toString());
+            // }
         }
-        
 
     }
-    
+
 }
