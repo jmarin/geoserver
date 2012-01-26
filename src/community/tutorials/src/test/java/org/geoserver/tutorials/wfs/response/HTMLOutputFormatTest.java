@@ -12,6 +12,11 @@ import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 
+/**
+ * 
+ * @author Juan Marin, OpenGeo
+ *
+ */
 
 public class HTMLOutputFormatTest extends WFSTestSupport {
 
@@ -25,6 +30,11 @@ public class HTMLOutputFormatTest extends WFSTestSupport {
         
         FeatureSource fs = getFeatureSource(MockData.PRIMITIVEGEOFEATURE);
         System.out.println(fs.getFeatures().size());
+        
+        //check write operation
+        
+        
+        
         FeatureIterator it = fs.getFeatures().features();
         while (it.hasNext()){
             SimpleFeature f = (SimpleFeature) it.next();
