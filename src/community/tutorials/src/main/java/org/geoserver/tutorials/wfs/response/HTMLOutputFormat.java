@@ -31,7 +31,9 @@ import org.opengis.feature.type.FeatureType;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * @author Juan Marin, OpenGeo Extends base class for HTML output format (table with attributes)
+ * Extends base class for HTML output format (table with attributes)
+ * 
+ * @author Juan Marin, OpenGeo jmarin@opengeo.org
  */
 public class HTMLOutputFormat extends WFSGetFeatureOutputFormat {
 
@@ -52,6 +54,7 @@ public class HTMLOutputFormat extends WFSGetFeatureOutputFormat {
         return mimeType;
     }
 
+    
     @Override
     public void write(FeatureCollectionResponse featureCollection, OutputStream output,
             Operation getFeature) throws IOException {
@@ -61,7 +64,7 @@ public class HTMLOutputFormat extends WFSGetFeatureOutputFormat {
                 .getSettings().getCharset()));
 
         log.info("Creating HTML output");
-        
+
         outWriter.write("<html>");
         outWriter.write("<head>");
         outWriter.write("<title>GeoServer Tutorials: WFS HTML Output Format</title>");
@@ -80,13 +83,13 @@ public class HTMLOutputFormat extends WFSGetFeatureOutputFormat {
                 for (AttributeDescriptor attributeDescriptor : attributeDescriptors) {
                     System.out.println(attributeDescriptor.getType());
                     if (attributeDescriptor instanceof GeometryDescriptorImpl) {
-                      //ignore Geometry column
+                        // ignore Geometry column
                     } else {
                         outWriter.write("<th>" + attributeDescriptor.getLocalName() + "</th>");
                     }
                 }
                 outWriter.write("</tr>");
-                
+
                 while (it.hasNext()) {
                     outWriter.write("<tr>");
                     SimpleFeature simpleFeature = (SimpleFeature) it.next();
@@ -95,7 +98,7 @@ public class HTMLOutputFormat extends WFSGetFeatureOutputFormat {
                     for (int i = 0; i < attributeCount; i++) {
                         Object attributeValue = simpleFeature.getAttribute(i);
                         if (attributeValue instanceof Geometry) {
-                          //ignore Geometry column
+                            // ignore Geometry column
                         } else {
                             if (attributeValue != null) {
                                 outWriter.write("<td>");
