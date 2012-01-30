@@ -1,7 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-  <bean id="HTMLOutputFormat" class="org.geoserver.tutorials.wfs.response.HTMLOutputFormat">
-    <constructor-arg ref="geoServer"/>
-  </bean>
+	<!-- Custom Output Format -->
+	<bean id="HTMLOutputFormat" class="org.geoserver.tutorials.wfs.response.HTMLOutputFormat">
+		<constructor-arg ref="geoServer" />
+	</bean>
+
+	<!-- REST Developer Tutorials -->
+	<bean id="hello" class="org.geoserver.rest.tutorials.HelloResource" />
+	<bean id="helloMap" class="org.geoserver.rest.tutorials.HelloMapResource"></bean>
+	<bean id="helloReflective" class="org.geoserver.rest.tutorials.HelloReflectiveResource"></bean>
+	<bean id="helloMapping" class="org.geoserver.rest.RESTMapping">
+		<property name="routes">
+			<map>
+				<entry>
+					<key>
+						<value>/hello.{format}</value>
+					</key>
+					<value>hello</value>
+				</entry>
+				<entry>
+					<key>
+						<value>/helloMap.{format}</value>
+					</key>
+					<value>helloMap</value>
+				</entry>
+				<entry>
+					<key>
+						<value>/helloReflective.{format}</value>
+					</key>
+					<value>helloReflective</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+
 </beans>

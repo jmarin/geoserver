@@ -25,11 +25,16 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.geoserver</groupId>
 			<artifactId>wfs</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geoserver</groupId>
+			<artifactId>rest</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
