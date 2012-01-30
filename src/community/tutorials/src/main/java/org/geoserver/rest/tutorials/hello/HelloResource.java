@@ -1,4 +1,4 @@
-package org.geoserver.rest.tutorials;
+package org.geoserver.rest.tutorials.hello;
 
 import java.util.ArrayList;
 import java.util.List;

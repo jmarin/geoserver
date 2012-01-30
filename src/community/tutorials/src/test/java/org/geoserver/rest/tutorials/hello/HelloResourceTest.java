@@ -1,4 +1,4 @@
-package org.geoserver.rest.tutorials;
+package org.geoserver.rest.tutorials.hello;
 
 import org.geoserver.test.GeoServerTestSupport;
 

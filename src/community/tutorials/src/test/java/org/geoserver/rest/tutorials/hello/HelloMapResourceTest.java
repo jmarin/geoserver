@@ -1,4 +1,4 @@
-package org.geoserver.rest.tutorials;
+package org.geoserver.rest.tutorials.hello;
 
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;

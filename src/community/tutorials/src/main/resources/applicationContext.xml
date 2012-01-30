@@ -7,9 +7,9 @@
 	</bean>
 
 	<!-- REST Developer Tutorials -->
-	<bean id="hello" class="org.geoserver.rest.tutorials.HelloResource" />
-	<bean id="helloMap" class="org.geoserver.rest.tutorials.HelloMapResource"></bean>
-	<bean id="helloReflective" class="org.geoserver.rest.tutorials.HelloReflectiveResource"></bean>
+	<bean id="hello" class="org.geoserver.rest.tutorials.hello.HelloResource" />
+	<bean id="helloMap" class="org.geoserver.rest.tutorials.hello.HelloMapResource"></bean>
+	<bean id="helloReflective" class="org.geoserver.rest.tutorials.hello.HelloReflectiveResource"></bean>
 	<bean id="helloMapping" class="org.geoserver.rest.RESTMapping">
 		<property name="routes">
 			<map>

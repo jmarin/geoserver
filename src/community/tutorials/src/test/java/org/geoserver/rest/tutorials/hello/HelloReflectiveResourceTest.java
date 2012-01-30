@@ -1,4 +1,4 @@
-package org.geoserver.rest.tutorials;
+package org.geoserver.rest.tutorials.hello;
 
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
@@ -31,7 +31,7 @@ public class HelloReflectiveResourceTest extends GeoServerTestSupport {
         
         //make assertions
         assertTrue(json instanceof JSONObject);
-        JSONObject hello = ((JSONObject)json).getJSONObject("org.geoserver.rest.tutorials.Hello");
+        JSONObject hello = ((JSONObject)json).getJSONObject("org.geoserver.rest.tutorials.hello.Hello");
         assertEquals("Hello World", hello.get("message"));
         
     }
