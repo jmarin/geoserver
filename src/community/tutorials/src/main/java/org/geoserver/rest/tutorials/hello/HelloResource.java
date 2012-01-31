@@ -24,7 +24,7 @@ public class HelloResource extends AbstractResource {
         //get the appropriate format
         DataFormat format = getFormatGet();
         
-        //transform the string "Hello World" to the appropriate responde
+        //transform the string "Hello World" to the appropriate response
         getResponse().setEntity(format.toRepresentation("Hello World"));
     }
 
