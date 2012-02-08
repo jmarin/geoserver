@@ -28,6 +28,7 @@ Contents
    configuration
    mapping-file
    app-schema-resolution
+   supported-gml-versions
    secondary-namespaces
    vocab-functions
    property-interpolation
