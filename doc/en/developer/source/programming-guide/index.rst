@@ -13,3 +13,4 @@ Programming Guide
    extension-points/index.rst
    wps/index.rst
    versioning/index.rst
+   tutorials/index.rst
