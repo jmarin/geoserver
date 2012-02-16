@@ -320,10 +320,6 @@ For example, the table below has multiple ``POSITION`` for each feature:
 ===== ========
  ID   POSITION
 ===== ========
-ID1.2  1948-01
-ID1.2  1948-02
-ID1.2  1948-03
-ID1.2  1948-04
 ID1.2  1948-05
 ID1.2  1948-06
 ID1.2  1948-07
@@ -344,7 +340,7 @@ The configuration file uses ``isList`` on ``timePositionList`` attribute mapped 
 The output produced::
 
     <csml:pointSeriesDomain>
-        <csml:TimeSeries gml:id="ID2.2">
+        <csml:TimeSeries gml:id="ID1.2">
             <csml:timePositionList>1949-05 1949-06 1949-07 1949-08 1949-09</csml:timePositionList>
         </csml:TimeSeries>
     </csml:pointSeriesDomain>
