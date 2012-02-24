@@ -48,6 +48,12 @@ To run online tests, enable the profile::
 This profile enables the data reference set tests and offline tests to run online. Data reference set tests are online tests based on data and use cases from GeoScience Victoria. Each is explicit for a database type (Oracle and Postgis) and has a copy to run with joining enabled. 
 
 The offline tests are configured to run online with joining through separate modules for each database: app-schema-oracle-test and app-schema-postgis-test. These modules are placeholders for pom.xml files containing database specific parameters. This makes it easy to identify when a test fails with a particular database when running from Maven/buildbot. 
+
+Memory requirements
+```````````````````
+
+The online tests require more memory than usual, so specifying the usual -Dtest.maxHeapSize=256m is not enough. Specify --Dtest.maxHeapSize=1024m instead.
+
 When the build is successful, you would see this in the "Reactor Summary"::
 
     [INFO] Application Schema Integration Online Test with Oracle Database  SUCCESS  [5:52.980s]
@@ -61,15 +67,17 @@ There is no need to import the online test modules as they are empty and you can
 To run offline tests (in app-schema-test/src/test/java/org/geoserver/test) with a test database, 
 enable joining and specify the database. Add these parameters in VM Arguments for postgis::
 
-    -Dapp-schema.joining=true -DtestDatabase=postgis
+    -Dapp-schema.joining=true -DtestDatabase=postgis -Xmx256m 
 
 Similarly, to test with oracle::
 
-    -Dapp-schema.joining=true -DtestDatabase=oracle
+    -Dapp-schema.joining=true -DtestDatabase=oracle -Xmx256m 
 
 Additionally for Oracle, you also need to add ojdbc14.jar in the test Classpath. 
 
-You do not need to specify these VM Arguments for running data reference tests (in app-schema-test/src/test/java/org/geoserver/test/onlineTest). However, you would still need to specify the Oracle JDBC driver in the Classpath for Oracle specific tests. 
+.. note:: Please note that you should only run the tests in org.geoserver.test package with the above parameters, since the data reference tests in org.geoserver.test.onlineTest package contain non-joining tests which would fail.   
+
+You do not need to specify these VM Arguments for running data reference tests (in app-schema-test/src/test/java/org/geoserver/test/onlineTest). However, you would still need to specify the Oracle JDBC driver in the Classpath for Oracle specific tests. Data reference tests package also requires 768m memory to run from JUnit. 
 
 Adding new tests
 ----------------
