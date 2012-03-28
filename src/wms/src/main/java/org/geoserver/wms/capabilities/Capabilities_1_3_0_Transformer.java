@@ -817,7 +817,7 @@ public class Capabilities_1_3_0_Transformer extends TransformerBase {
                 qatts.addAttribute("", "cascaded", "cascaded", "", String.valueOf(cascadedHopCount));
             }
             start("Layer", qatts);
-            element("Name", layer.getResource().getNamespace().getPrefix() + ":" + layer.getName());
+            element("Name", layer.prefixedName());
             // REVISIT: this is bad, layer should have title and anbstract by itself
             element("Title", layer.getResource().getTitle());
             element("Abstract", layer.getResource().getAbstract());
@@ -929,7 +929,7 @@ public class Capabilities_1_3_0_Transformer extends TransformerBase {
             });
 
             for (LayerGroupInfo layerGroup : layerGroups) {
-                String layerName = layerGroup.getName();
+                String layerName = layerGroup.prefixedName();
 
                 AttributesImpl qatts = new AttributesImpl();
                 boolean queryable = wmsConfig.isQueryable(layerGroup);

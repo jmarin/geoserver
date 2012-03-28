@@ -797,7 +797,7 @@ public class GetCapabilitiesTransformer extends TransformerBase {
             }
             
             start("Layer", qatts);
-            element("Name", layer.getResource().getNamespace().getPrefix() + ":" + layer.getName());
+            element("Name", layer.prefixedName());
             // REVISIT: this is bad, layer should have title and anbstract by itself
             element("Title", layer.getResource().getTitle());
             element("Abstract", layer.getResource().getAbstract());
@@ -927,7 +927,8 @@ public class GetCapabilitiesTransformer extends TransformerBase {
             });
 
             for (LayerGroupInfo layerGroup : layerGroups) {
-                String layerName = layerGroup.getName();
+                //String layerName = layerGroup.getName();
+                String layerName = layerGroup.prefixedName();
 
                 AttributesImpl qatts = new AttributesImpl();
                 boolean queryable = wmsConfig.isQueryable(layerGroup);
@@ -1198,8 +1199,8 @@ public class GetCapabilitiesTransformer extends TransformerBase {
                         handleBBox(tbbox, crs);
                     } 
                     catch(Exception e) {
-                        LOGGER.warning(String.format("Unable to transform bounding box for layer" +
-                            " '%s' to %s", layer.getName(), crs));
+                        LOGGER.warning(String.format("Unable to transform bounding box for '%s' layer" +
+                                " to %s", layer != null ? layer.getName() : "root", srs));
                         if (LOGGER.isLoggable(Level.FINE)) {
                             LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
                         }

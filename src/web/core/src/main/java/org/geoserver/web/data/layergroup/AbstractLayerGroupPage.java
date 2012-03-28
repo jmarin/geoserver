@@ -8,11 +8,15 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.Page;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextField;
@@ -28,10 +32,14 @@ import org.geoserver.catalog.CatalogBuilder;
 import org.geoserver.catalog.LayerGroupInfo;
 import org.geoserver.catalog.LayerInfo;
 import org.geoserver.catalog.StyleInfo;
+import org.geoserver.catalog.WorkspaceInfo;
+import org.geoserver.web.ComponentAuthorizer;
 import org.geoserver.web.GeoServerApplication;
 import org.geoserver.web.GeoServerSecuredPage;
 import org.geoserver.web.data.layer.LayerDetachableModel;
 import org.geoserver.web.data.style.StyleDetachableModel;
+import org.geoserver.web.data.workspace.WorkspaceChoiceRenderer;
+import org.geoserver.web.data.workspace.WorkspacesModel;
 import org.geoserver.web.publish.LayerConfigurationPanel;
 import org.geoserver.web.publish.LayerConfigurationPanelInfo;
 import org.geoserver.web.publish.LayerGroupConfigurationPanel;
@@ -58,21 +66,36 @@ public abstract class AbstractLayerGroupPage extends GeoServerSecuredPage {
     LayerGroupEntryPanel lgEntryPanel;
     String layerGroupId;
     
+    protected Class<? extends Page> returnPage;
+    private ListView<LayerGroupConfigurationPanelInfo> extensionPanels;
     /**
      * Subclasses must call this method to initialize the UI for this page 
      * @param layerGroup
      */
     protected void initUI(LayerGroupInfo layerGroup) {
+        this.returnPage = LayerGroupPage.class;
         lgModel = new LayerGroupDetachableModel( layerGroup );
         layerGroupId = layerGroup.getId();
         
         Form form = new Form( "form", new CompoundPropertyModel( lgModel ) );
+
         add(form);
         TextField name = new TextField("name");
         name.setRequired(true);
-        name.add(new GroupNameValidator());
+        //JD: don't need this, this is validated at the catalog level
+        //name.add(new GroupNameValidator());
         form.add(name);
         
+        DropDownChoice<WorkspaceInfo> wsChoice = 
+                new DropDownChoice("workspace", new WorkspacesModel(), new WorkspaceChoiceRenderer());
+        wsChoice.setNullValid(true);
+        if (!isAuthenticatedAsAdmin()) {
+            wsChoice.setNullValid(false);
+            wsChoice.setRequired(true);
+        }
+
+        form.add(wsChoice);
+
         //bounding box
         form.add(envelopePanel = new EnvelopePanel( "bounds" )/*.setReadOnly(true)*/);
         envelopePanel.setRequired(true);
@@ -115,19 +138,19 @@ public abstract class AbstractLayerGroupPage extends GeoServerSecuredPage {
         form.add(lgEntryPanel = new LayerGroupEntryPanel( "layers", layerGroup ));
         
         //Add panels contributed through extension point
-        form.add(extensionPanels());
+        form.add(extensionPanels = extensionPanels());
         
         form.add(saveLink());
         form.add(cancelLink());
     }
 
-    private Component extensionPanels() {
+    private ListView<LayerGroupConfigurationPanelInfo> extensionPanels() {
 
         final GeoServerApplication gsapp = getGeoServerApplication();
         final List<LayerGroupConfigurationPanelInfo> extensions;
         extensions = gsapp.getBeansOfType(LayerGroupConfigurationPanelInfo.class);
 
-        Component list;
+        ListView<LayerGroupConfigurationPanelInfo> list;
         list = new ListView<LayerGroupConfigurationPanelInfo>("contributedPanels", extensions) {
 
             @Override
@@ -151,8 +174,13 @@ public abstract class AbstractLayerGroupPage extends GeoServerSecuredPage {
         return list;
     }
 
-    private BookmarkablePageLink cancelLink() {
-        return new BookmarkablePageLink("cancel", LayerGroupPage.class);
+    private Component cancelLink() {
+        return new AjaxLink<String>("cancel") {
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                setResponsePage(returnPage);
+            }
+        };
     }
 
     private SubmitLink saveLink() {
@@ -173,10 +201,29 @@ public abstract class AbstractLayerGroupPage extends GeoServerSecuredPage {
                     lg.getLayers().add(entry.getLayer());
                     lg.getStyles().add(entry.getStyle());
                 }
+
+                try {
+                    AbstractLayerGroupPage.this.save();
+                }
+                catch(Exception e) {
+                    error(e);
+                    LOGGER.log(Level.WARNING, "Error adding/modifying layer group.", e);    
+                }
                 
-                AbstractLayerGroupPage.this.onSubmit();
             }
         };
+    }
+    
+    private final void save() {
+        onSubmit();
+        this.extensionPanels.visitChildren(LayerGroupConfigurationPanel.class,
+                new IVisitor<LayerGroupConfigurationPanel>() {
+                    @Override
+                    public Object component(LayerGroupConfigurationPanel extensionPanel) {
+                        extensionPanel.save();
+                        return CONTINUE_TRAVERSAL;
+                    }
+                });
     }
     
     /**
@@ -292,5 +339,20 @@ public abstract class AbstractLayerGroupPage extends GeoServerSecuredPage {
             }
         }
         
+    }
+
+    /**
+     * Allows to set a different return page, defaults to {@link LayerGroupPage} if not set
+     * 
+     * @param returnPage
+     *            the page to return to when this one is either submitted or cancelled
+     */
+    public void setReturnPage(Class<? extends Page> returnPage) {
+        this.returnPage = returnPage == null? LayerGroupPage.class : returnPage;
+    }
+
+    @Override
+    protected ComponentAuthorizer getPageAuthorizer() {
+        return ComponentAuthorizer.WORKSPACE_ADMIN;
     }
 }

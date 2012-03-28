@@ -20,7 +20,7 @@
   </bean>
   
   <!-- For each configuration bean above, add them below to activate -->
-  <bean id="gwcTLDispatcher" class="org.geowebcache.layer.TileLayerDispatcher">
+  <bean id="gwcTLDispatcher" class="org.geowebcache.layer.TileLayerDispatcher" depends-on="geoServer">
     <constructor-arg ref="gwcGridSetBroker"/>
   </bean>
   
@@ -36,7 +36,7 @@
     </constructor-arg>
     <constructor-arg>
       <description>Max number of connections in the pool</description>
-      <value>15</value>
+      <value>150</value>
     </constructor-arg>
   </bean>
   
