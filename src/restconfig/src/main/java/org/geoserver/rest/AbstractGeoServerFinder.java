@@ -1,3 +1,7 @@
+/* Copyright (c) 2001 - 2007 TOPP - www.openplans.org.  All rights reserved.
+ * This code is licensed under the GPL 2.0 license, availible at the root
+ * application directory.
+ */
 package org.geoserver.rest;
 
 import org.geoserver.config.GeoServer;
@@ -5,6 +9,11 @@ import org.geoserver.rest.util.RESTUtils;
 import org.restlet.Finder;
 import org.restlet.data.Request;
 
+/**
+ * 
+ * @author Juan Marin, OpenGeo
+ *
+ */
 public class AbstractGeoServerFinder extends Finder{
 
     protected GeoServer geoServer;
