@@ -36,15 +36,31 @@ public class GlobalSettingsResource extends AbstractCatalogResource {
     @Override
     protected Object handleObjectGet() throws Exception {
         String workspace = getAttribute("workspace");
-        Catalog catalog = geoServer.getCatalog();
-        GeoServerFacade geoServerFacade = geoServer.getFacade();
         if (workspace != null) {
+            Catalog catalog = geoServer.getCatalog();
+            GeoServerFacade geoServerFacade = geoServer.getFacade();
             WorkspaceInfo workspaceInfo = catalog.getWorkspaceByName(workspace);
             SettingsInfo settingsInfo = geoServerFacade.getSettings(workspaceInfo);
             return settingsInfo.getContact();
         }
         ContactInfo contactInfo = geoServer.getGlobal().getSettings().getContact();
         return contactInfo;
+    }
+
+    protected String handleObjectPost(Object object) throws Exception {
+        String value = "";
+        if (object instanceof SettingsInfo) {
+            SettingsInfo settingsInfo = (SettingsInfo) object;
+            geoServer.save(settingsInfo);
+            value = settingsInfo.getTitle();
+        } else if (object instanceof ContactInfo) {
+            ContactInfo contactInfo = (ContactInfo) object;
+            value = contactInfo.getContactPerson();
+            SettingsInfo settingsInfo = geoServer.getGlobal().getSettings();
+            settingsInfo.setContact(contactInfo);
+            geoServer.save(settingsInfo);
+        }
+        return value;
     }
 
     @Override
