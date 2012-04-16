@@ -43,4 +43,21 @@ public class GlobalSettingsTest extends GeoServerTestSupport {
         assertEquals("DC", contactInfo.get("addressState"));
         assertEquals("20001", contactInfo.get("addressPostalCode").toString());
     }
+
+    public void testPostContactInfo() throws Exception {
+        fail("not yet implemented");
+    }
+    
+    public void testPutContactInfo() throws Exception {
+        fail("not yet implemented");
+    }
+    
+    public void testDeleteContactInfo() throws Exception {
+        JSON json = getAsJSON("/rest/settings.json");
+        JSONObject jsonObject = (JSONObject) json;
+        assertNotNull(jsonObject);
+        assertEquals( 200, deleteAsServletResponse( "/rest/settings" ).getStatusCode());
+        json = getAsJSON("/rest/settings.json");
+        assertNull(json);
+    }
 }

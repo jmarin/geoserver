@@ -280,6 +280,7 @@ public class XStreamPersister {
         xs.aliasField("abstract", ResourceInfoImpl.class, "_abstract" );
         xs.alias("AuthorityURL", AuthorityURLInfo.class);
         xs.alias("Identifier", LayerIdentifierInfo.class);
+        xs.alias("ContactInfo", ContactInfo.class);
         
         // GeoServerInfo
         xs.omitField(impl(GeoServerInfo.class), "clientProperties");

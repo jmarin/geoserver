@@ -12,6 +12,7 @@ import org.geoserver.config.GeoServer;
 import org.geoserver.config.GeoServerFacade;
 import org.geoserver.config.GeoServerInfo;
 import org.geoserver.config.SettingsInfo;
+import org.geoserver.config.impl.ContactInfoImpl;
 import org.geoserver.config.util.XStreamPersister;
 import org.geoserver.rest.format.DataFormat;
 import org.restlet.Context;
@@ -23,14 +24,37 @@ import org.restlet.data.Response;
  * @author Juan Marin, OpenGeo
  *
  */
-public class GlobalSettingsResource extends AbstractCatalogResource {
+public class GlobalSettingsResource extends AbstractGeoServerResource {
 
     private GeoServer geoServer;
 
     public GlobalSettingsResource(Context context, Request request, Response response, Class clazz,
             GeoServer geoServer) {
-        super(context, request, response, clazz, geoServer.getCatalog());
+        super(context, request, response, clazz, geoServer);
         this.geoServer = geoServer;
+    }
+
+    @Override
+    public boolean allowPost() {
+        return true;
+    }
+
+    @Override
+    public boolean allowPut() {
+        return allowExisting();
+    }
+
+    @Override
+    public boolean allowDelete() {
+        return allowExisting();
+    }
+
+    private boolean allowExisting() {
+        String workspace = getAttribute("workspace");
+        if (workspace != null) {
+            return geoServer.getSettings() != null;
+        }
+        return geoServer.getGlobal().getSettings().getContact() != null;
     }
 
     @Override
@@ -56,11 +80,25 @@ public class GlobalSettingsResource extends AbstractCatalogResource {
         } else if (object instanceof ContactInfo) {
             ContactInfo contactInfo = (ContactInfo) object;
             value = contactInfo.getContactPerson();
-            SettingsInfo settingsInfo = geoServer.getGlobal().getSettings();
+            GeoServerInfo geoServerInfo = geoServer.getGlobal();
+            SettingsInfo settingsInfo = geoServerInfo.getSettings();
             settingsInfo.setContact(contactInfo);
-            geoServer.save(settingsInfo);
+            geoServer.save(geoServerInfo);
         }
         return value;
+    }
+
+    @Override
+    public void handleObjectDelete() {
+        String workspace = getAttribute("workspace");
+        if (workspace != null) {
+            
+        }
+        GeoServerInfo geoServerInfo = geoServer.getGlobal();
+        ContactInfo contactInfo = new ContactInfoImpl();
+        geoServerInfo.getSettings().setContact(contactInfo);
+        geoServer.save(geoServerInfo);
+        
     }
 
     @Override

@@ -17,20 +17,22 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 
+import com.thoughtworks.xstream.XStream;
+
 /**
  * 
  * @author Juan Marin, OpenGeo
- *
+ * 
  */
 public abstract class GeoServerResourceBase extends ReflectiveResource {
 
     /**
      * logger
      */
-    static Logger LOGGER = Logging.getLogger( "org.geoserver.rest");
+    static Logger LOGGER = Logging.getLogger("org.geoserver.rest");
 
     protected GeoServer geoServer;
-    
+
     protected Class clazz;
 
     /**
@@ -38,19 +40,22 @@ public abstract class GeoServerResourceBase extends ReflectiveResource {
      */
     protected XStreamPersisterFactory xpf;
 
-    public GeoServerResourceBase(Context context,Request request, Response response, Class clazz,
+    public GeoServerResourceBase(Context context, Request request, Response response, Class clazz,
             GeoServer geoServer) {
-        super( context, request, response );
+        super(context, request, response);
         this.clazz = clazz;
         this.geoServer = geoServer;
         this.xpf = GeoServerExtensions.bean(XStreamPersisterFactory.class);
     }
 
     @Override
-    protected DataFormat createHTMLFormat(Request request,Response response) {
-        return new CatalogFreemarkerHTMLFormat( clazz, request, response, this );
+    protected DataFormat createHTMLFormat(Request request, Response response) {
+        return new CatalogFreemarkerHTMLFormat(clazz, request, response, this);
     }
 
+    @Override
+    protected void configureXStream(XStream xstream) {
 
+    }
 
 }
