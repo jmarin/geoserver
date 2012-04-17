@@ -320,6 +320,10 @@
             <key><value>/settings.{format}</value></key>
             <value>globalSettingsFinder</value>
         </entry>
+        <entry>
+            <key><value>/settings</value></key>
+            <value>globalSettingsFinder</value>
+        </entry>
   </map>
 </property>
 </bean>

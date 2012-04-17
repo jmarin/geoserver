@@ -36,7 +36,7 @@ public class GlobalSettingsResource extends AbstractGeoServerResource {
 
     @Override
     public boolean allowPost() {
-        return true;
+        return allowExisting();
     }
 
     @Override

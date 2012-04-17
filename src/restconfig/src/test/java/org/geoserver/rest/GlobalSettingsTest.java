@@ -3,6 +3,7 @@ package org.geoserver.rest;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 
+import org.geoserver.catalog.rest.CatalogRESTTestSupport;
 import org.geoserver.config.ContactInfo;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.GeoServerInfo;
@@ -12,7 +13,7 @@ import org.geoserver.platform.GeoServerExtensions;
 import org.geoserver.test.GeoServerTestSupport;
 import org.w3c.dom.Document;
 
-public class GlobalSettingsTest extends GeoServerTestSupport {
+public class GlobalSettingsTest extends CatalogRESTTestSupport {
 
     protected GeoServer geoServer;
 
@@ -27,7 +28,7 @@ public class GlobalSettingsTest extends GeoServerTestSupport {
         contactInfo.setAddressCountry("United States");
         contactInfo.setAddressState("DC");
         GeoServerInfo geoServerInfo = geoServer.getGlobal();
-        SettingsInfo settingsInfo = geoServerInfo.getSettings(); 
+        SettingsInfo settingsInfo = geoServerInfo.getSettings();
         settingsInfo.setContact(contactInfo);
         geoServer.save(geoServerInfo);
     }
@@ -36,7 +37,7 @@ public class GlobalSettingsTest extends GeoServerTestSupport {
         JSON json = getAsJSON("/rest/settings.json");
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
-        JSONObject contactInfo = jsonObject.getJSONObject("org.geoserver.config.ContactInfo");
+        JSONObject contactInfo = jsonObject.getJSONObject("ContactInfo");
         assertEquals("United States", contactInfo.get("addressCountry"));
         assertEquals("1600 Pennsylvania Avenue", contactInfo.get("address"));
         assertEquals("Washington", contactInfo.get("addressCity"));
@@ -47,17 +48,19 @@ public class GlobalSettingsTest extends GeoServerTestSupport {
     public void testPostContactInfo() throws Exception {
         fail("not yet implemented");
     }
-    
+
     public void testPutContactInfo() throws Exception {
         fail("not yet implemented");
     }
-    
+
     public void testDeleteContactInfo() throws Exception {
         JSON json = getAsJSON("/rest/settings.json");
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
-        assertEquals( 200, deleteAsServletResponse( "/rest/settings" ).getStatusCode());
+        assertEquals(200, deleteAsServletResponse("/rest/settings").getStatusCode());
         json = getAsJSON("/rest/settings.json");
-        assertNull(json);
+        assertNotNull(json);
+        JSONObject contactInfo = ((JSONObject) json).getJSONObject("ContactInfo");
+        assertEquals("contact", contactInfo.get("id"));
     }
 }
