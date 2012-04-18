@@ -3,12 +3,12 @@
 WMS vendor parameters
 =====================
 
-WFS vendor parameters are options that are not defined in the official WMS specification, but are allowed by it.  GeoServer supports a range of custom WMS parameters.
+WMS vendor parameters are custom request parameters that are not defined in the WMS specification, but are allowed by it.  GeoServer supports a variety of WMS vendor-specific parameters.
 
 angle
 -----
 
-Starting with GeoServer 2.0.2 ``angle=x`` rotates the map around its center by `x` degrees clockwise. The rotation is supported in all raster formats, PDF and SVG based on the Batik producer (the default one).
+``angle=x`` rotates the output map around its center by `x` degrees clockwise. The rotation is supported in all raster formats, PDF, and SVG based on the Batik producer (which is the default).
 
 buffer
 ------
@@ -36,49 +36,62 @@ In case the automatic evaluation fails, the following defaults apply:
 cql_filter
 ----------
 
-The ``cql_filter`` parameter is similar to the ``filter`` parameter, expect that the filter is encoded using CQL (Common Query Language).  This makes the request much more human readable.  However, CQL isn't as flexible as OGC filters, and can't encode as many types of filters as the OGC specification does. In particular, filters by feature ID are not supported.  If more than one layer is specified in the ``layers`` parameter, then more than one filter can be specified here, each corresponding to a layer.
+The ``cql_filter`` parameter is similar to the standard ``filter`` parameter, but the filter is expressed using CQL (Common Query Language).  
+This makes the filter logic more concise and readable.  
+However, CQL isn't as flexible as OGC filters, and can't express certain kinds of queries. 
+In particular, filtering by feature ID is not supported.  
 
-An example of the same filter as above using CQL::
+If more than one layer is specified in the ``layers`` parameter, then more than one filter can be specified, each corresponding to a layer.
+
+An example of a CQL filter is::
 
    cql_filter=INTERSECT(the_geom,%20POINT%20(-74.817265%2040.5296504))
+   
+See also the :ref:`cql_tutorial` tutorial.
 
 env
 ---
 
 The ``env`` parameter defines the set of substitution values that can be used in SLD variable substitution. The syntax is::
 
-  param1:value1;param2:value2;...
+  env=param1:value1;param2:value2;...
+  
+See :ref:`sld_variable_substitution` for more information.
 
 featureid
 ---------
 
-The ``featureid`` parameter filters by feature ID, a unique value given to all features.  Multiple features can be selected by separating the featureids by comma, as seen in this example::
+The ``featureid`` parameter filters by feature ID, a unique value given to all features.  Multiple features can be selected by separating the featureids by comma, as in this example::
 
    featureid=states.1,states.45  
 
 filter
 ------
 
-The WMS specification does not allow for much filtering of data.  GeoServer's WMS filter options are expanded to match those allowed by WFS.
+The WMS specification allows only limited filtering of data.  
+GeoServer expands the WMS filter capability to match those allowed by WFS.
+The ``filter`` parameter specifies a list of OGC filters (encoded in in XML).  
+The list is enclosed in () parenthesis.  
+When used in a GET request, the XML tag brackets must be URL-encoded.  
 
-The ``filter`` parameter encodes a list of OGC filters (in XML).  The list is enclosed in () parenthesis.  When this parameter is used in a GET request, the brackets of XML need to be URL-encoded.  If more than one layer is specified in the ``layers`` parameter, then more than one filter can be specified here, each corresponding to a layer.
+If more than one layer is specified in the ``layers`` parameter, then more than one filter can be specified, each corresponding to a layer.
 
-An example of an OGC filter encoded as part of a GET request::
+An example of an OGC filter encoded in a GET request is::
 
    filter=%3CFilter%20xmlns:gml=%22http://www.opengis.net/gml%22%3E%3CIntersects%3E%3CPropertyName%3Ethe_geom%3C/PropertyName%3E%3Cgml:Point%20srsName=%224326%22%3E%3Cgml:coordinates%3E-74.817265,40.5296504%3C/gml:coordinates%3E%3C/gml:Point%3E%3C/Intersects%3E%3C/Filter%3E
    
 format_options
 --------------
 
-The ``format_options`` is a container for parameters that are format specific. The options in it are expressed as::
+The ``format_options`` is a container for parameters that are format-specific. The options in it are expressed as::
   
     param1:value1;param2:value2;...
     
-The currently recognized format options are:
+The supported format options are:
 
-* ``antialiasing`` (on, off, text): allows to control the use of antialiased rendering in raster outputs. 
-* ``dpi``: sets the rendering dpi in raster outputs. The OGC standard dpi is 90, but if you need to perform high resolution printouts it is advised to grab a larger image and set a higher dpi. For example, to print at 300dpi a 100x100 image it is advised to ask for a 333x333 image setting the dpi value at 300. In general the image size should be increased by a factor equal to ``targetDpi/90`` and the target dpi set in the format options.
-* ``layout``: chooses a named layout for decorations, a tool for visually annotating GeoServer's WMS output.  Layouts can be used to add information such as compasses and legends to the maps you retrieve from GeoServer.  :ref:`wms_decorations` are discussed further in the :ref:`advanced_config` section.
+* ``antialiasing`` (values = ``on``, ``off``, ``text``): controls the use of antialiased rendering in raster output. 
+* ``dpi``: sets the rendering dpi in raster outputs. The OGC standard dpi is 90, but if you need to create high resolution images (e.g for printing) it is advisable to request a larger image and set a higher dpi. For example, to print  a 100x100 image at 300dpi it is advisable to ask for a 333x333 image with the dpi value set to 300. In general the image size should be increased by a factor equal to ``targetDpi/90`` and the target dpi set in the format options.
+* ``layout``: chooses a named layout for decorations, which are visual annotations on the WMS output.  Layouts are used to add decorators such as compasses and legends.  :ref:`wms_decorations` are discussed further in the :ref:`advanced_config` section.
 
 kmattr
 ------
