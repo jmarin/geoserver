@@ -15,14 +15,14 @@ import org.restlet.resource.Resource;
  * @author Juan Marin, OpenGeo
  *
  */
-public class GlobalSettingsFinder extends AbstractGeoServerFinder {
+public class SettingsFinder extends AbstractGeoServerFinder {
 
-    public GlobalSettingsFinder(GeoServer geoServer) {
+    public SettingsFinder(GeoServer geoServer) {
         super(geoServer);
     }
 
     @Override
     public Resource findTarget(Request request, Response response) {
-        return new GlobalSettingsResource(getContext(), request, response, GeoServerInfo.class, geoServer);
+        return new SettingsResource(getContext(), request, response, GeoServerInfo.class, geoServer);
     }
 }

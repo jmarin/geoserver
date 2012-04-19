@@ -318,11 +318,20 @@
         </entry>
         <entry>
             <key><value>/settings.{format}</value></key>
-            <value>globalSettingsFinder</value>
+            <value>settingsFinder</value>
         </entry>
         <entry>
             <key><value>/settings</value></key>
+            <value>settingsFinder</value>
+        </entry>
+
+        <!-- <entry>
+            <key><value>/settings/{workspace}</value></key>
             <value>globalSettingsFinder</value>
+        </entry> -->
+        <entry>
+            <key><value>/settings/{workspace}.{format}</value></key>
+            <value>settingsFinder</value>
         </entry>
   </map>
 </property>
@@ -348,7 +357,7 @@
   <bean id="styleFinder2" class="org.geoserver.catalog.rest.StyleFinder" parent="abstractCatalogFinder"/>
   <bean id="layerFinder2" class="org.geoserver.catalog.rest.LayerFinder" parent="abstractCatalogFinder"/>
   <bean id="layerGroupFinder2" class="org.geoserver.catalog.rest.LayerGroupFinder" parent="abstractCatalogFinder"/>
-  <bean id="globalSettingsFinder" class="org.geoserver.rest.GlobalSettingsFinder" parent="abstractGeoServerFinder"/>
+  <bean id="settingsFinder" class="org.geoserver.rest.SettingsFinder" parent="abstractGeoServerFinder"/>
   
   <bean id="catalogReloader" class="org.geoserver.catalog.rest.CatalogReloader">
      <constructor-arg index="0" ref="geoServer"/>

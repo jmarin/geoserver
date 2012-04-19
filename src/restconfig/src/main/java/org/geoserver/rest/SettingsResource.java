@@ -30,11 +30,11 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
  * @author Juan Marin, OpenGeo
  * 
  */
-public class GlobalSettingsResource extends AbstractCatalogResource {
+public class SettingsResource extends AbstractCatalogResource {
 
     private GeoServer geoServer;
 
-    public GlobalSettingsResource(Context context, Request request, Response response, Class clazz,
+    public SettingsResource(Context context, Request request, Response response, Class clazz,
             GeoServer geoServer) {
         super(context, request, response, clazz, geoServer.getCatalog());
         this.geoServer = geoServer;
@@ -80,7 +80,12 @@ public class GlobalSettingsResource extends AbstractCatalogResource {
     public void handleObjectPut(Object object) {
         String workspace = getAttribute("workspace");
         if (workspace != null) {
-
+            GeoServerFacade geoServerFacade = geoServer.getFacade();
+            WorkspaceInfo workspaceInfo = catalog.getWorkspaceByName(workspace);
+            SettingsInfo settingsInfo = (SettingsInfo) object;
+            SettingsInfo original = geoServerFacade.getSettings(workspaceInfo);
+            OwsUtils.copy(settingsInfo, original, SettingsInfo.class);
+            geoServer.save(original);
         }
         GeoServerInfo geoServerInfo = (GeoServerInfo) object;
         GeoServerInfo original = geoServer.getGlobal();
