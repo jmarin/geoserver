@@ -2,7 +2,8 @@
 
 <h2>Global Settings</h2>
 
-<h4>Contact Info:</h4> 
+
+<h4>Contact Info:</h4>
 
 <ul>
 	<li>Address:</li>
