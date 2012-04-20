@@ -333,6 +333,23 @@
             <key><value>/settings/{workspace}.{format}</value></key>
             <value>settingsFinder</value>
         </entry>
+
+        <entry>
+            <key><value>/services/wms/settings</value></key>
+            <value>wmsSettingsFinder</value>
+        </entry>
+        <entry>
+            <key><value>/services/wms/settings.{format}</value></key>
+            <value>wmsSettingsFinder</value>
+        </entry>
+        <!-- <entry>
+            <key><value>/services/wfs/settings</value></key>
+            <value>wfsSettingsFinder</value>
+        </entry>
+        <entry>
+            <key><value>/services/wcs/settings</value></key>
+            <value>wcsSettingsFinder</value>
+        </entry> -->
   </map>
 </property>
 </bean>
@@ -358,6 +375,9 @@
   <bean id="layerFinder2" class="org.geoserver.catalog.rest.LayerFinder" parent="abstractCatalogFinder"/>
   <bean id="layerGroupFinder2" class="org.geoserver.catalog.rest.LayerGroupFinder" parent="abstractCatalogFinder"/>
   <bean id="settingsFinder" class="org.geoserver.rest.SettingsFinder" parent="abstractGeoServerFinder"/>
+  <bean id="wmsSettingsFinder" class="org.geoserver.service.rest.WMSSettingsFinder" parent="abstractGeoServerFinder"/>
+  <!-- <bean id="wfsSettingsFinder" class="org.geoserver.service.rest.WFSSettingsFinder" parent="abstractGeoServerFinder"/>
+  <bean id="wcsSettingsFinder" class="org.geoserver.service.rest.WCSSettingsFinder" parent="abstractGeoServerFinder"/> -->
   
   <bean id="catalogReloader" class="org.geoserver.catalog.rest.CatalogReloader">
      <constructor-arg index="0" ref="geoServer"/>
