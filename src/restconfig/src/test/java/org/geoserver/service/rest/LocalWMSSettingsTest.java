@@ -35,7 +35,6 @@ public class LocalWMSSettingsTest extends CatalogRESTTestSupport {
         JSONObject workspace = (JSONObject) wmsinfo.get("workspace");
         assertNotNull(workspace);
         assertEquals("sf", workspace.get("name"));
-        ;
         JSONObject watermark = (JSONObject) wmsinfo.get("watermark");
         assertEquals("false", watermark.get("enabled").toString().trim());
         assertEquals("Nearest", wmsinfo.get("interpolation"));
