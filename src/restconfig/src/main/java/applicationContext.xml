@@ -342,6 +342,16 @@
             <key><value>/services/wms/settings.{format}</value></key>
             <value>wmsSettingsFinder</value>
         </entry>
+        
+        <entry>
+            <key><value>/services/wms/{workspace}/settings</value></key>
+            <value>wmsSettingsFinder</value>
+        </entry>
+        <entry>
+            <key><value>/services/wms/{workspace}/settings.{format}</value></key>
+            <value>wmsSettingsFinder</value>
+        </entry>
+        
         <!-- <entry>
             <key><value>/services/wfs/settings</value></key>
             <value>wfsSettingsFinder</value>

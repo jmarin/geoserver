@@ -23,6 +23,20 @@ public class WMSSettingsResource extends AbstractCatalogResource {
     }
 
     @Override
+    public boolean allowPut() {
+        return allowExisting();
+    }
+
+    private boolean allowExisting() {
+        String workspace = getAttribute("workspace");
+        if (workspace != null) {
+            WorkspaceInfo workspaceInfo = geoServer.getCatalog().getWorkspaceByName(workspace);
+            return geoServer.getService(workspaceInfo, WMSInfo.class) != null;
+        }
+        return geoServer.getService(WMSInfo.class) != null;
+    }
+
+    @Override
     protected Object handleObjectGet() throws Exception {
         String workspace = getAttribute("workspace");
         if (workspace != null) {
@@ -33,10 +47,14 @@ public class WMSSettingsResource extends AbstractCatalogResource {
     }
 
     @Override
+    protected void handleObjectPut(Object object) throws Exception {
+        
+    }
+
+    @Override
     protected void configurePersister(XStreamPersister persister, DataFormat format) {
         persister.setHideFeatureTypeAttributes();
         persister.getXStream().alias("wmsinfo", WMSInfoImpl.class);
-        persister.getXStream().alias("", org.geotools.util.Version.class);
     }
 
 }
