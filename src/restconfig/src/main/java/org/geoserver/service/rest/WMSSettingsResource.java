@@ -5,6 +5,7 @@ import org.geoserver.catalog.rest.AbstractCatalogResource;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.ServiceInfo;
 import org.geoserver.config.util.XStreamPersister;
+import org.geoserver.ows.util.OwsUtils;
 import org.geoserver.rest.format.DataFormat;
 import org.geoserver.wms.WMSInfo;
 import org.geoserver.wms.WMSInfoImpl;
@@ -30,8 +31,8 @@ public class WMSSettingsResource extends AbstractCatalogResource {
     private boolean allowExisting() {
         String workspace = getAttribute("workspace");
         if (workspace != null) {
-            WorkspaceInfo workspaceInfo = geoServer.getCatalog().getWorkspaceByName(workspace);
-            return geoServer.getService(workspaceInfo, WMSInfo.class) != null;
+            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            return geoServer.getService(ws, WMSInfo.class) != null;
         }
         return geoServer.getService(WMSInfo.class) != null;
     }
@@ -40,15 +41,27 @@ public class WMSSettingsResource extends AbstractCatalogResource {
     protected Object handleObjectGet() throws Exception {
         String workspace = getAttribute("workspace");
         if (workspace != null) {
-            WorkspaceInfo workspaceInfo = geoServer.getCatalog().getWorkspaceByName(workspace);
-            return geoServer.getService(workspaceInfo, WMSInfo.class);
+            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            return geoServer.getService(ws, WMSInfo.class);
         }
         return (ServiceInfo) geoServer.getService(WMSInfo.class);
     }
 
     @Override
     protected void handleObjectPut(Object object) throws Exception {
-        
+        String workspace = getAttribute("workspace");
+        WMSInfo wmsInfo = (WMSInfo) object;
+        WMSInfo original = null;
+        if (workspace != null) {
+            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            original = geoServer.getService(ws, WMSInfo.class);
+            OwsUtils.copy(wmsInfo, original, WMSInfo.class);
+            original.setWorkspace(ws);
+        } else {
+            original = geoServer.getService(WMSInfo.class);
+        }
+        OwsUtils.copy(wmsInfo, original, WMSInfo.class);
+        geoServer.save(original);
     }
 
     @Override
