@@ -1,13 +1,24 @@
+/* Copyright (c) 2001 - 2012 TOPP - www.openplans.org.  All rights reserved.
+ * This code is licensed under the GPL 2.0 license, available at the root
+ * application directory.
+ */
 package org.geoserver.service.rest;
 
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.catalog.rest.AbstractCatalogResource;
 import org.geoserver.config.GeoServer;
+import org.geoserver.config.ServiceInfo;
+import org.geoserver.ows.util.OwsUtils;
 import org.geoserver.wms.WMSInfo;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 
+/**
+ * 
+ * @author Juan Marin, OpenGeo
+ * 
+ */
 public class ServiceSettingsResource extends AbstractCatalogResource {
 
     private GeoServer geoServer;
@@ -37,7 +48,29 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
 
     @Override
     protected Object handleObjectGet() throws Exception {
-        return null;
+        String workspace = getAttribute("workspace");
+        if (workspace != null) {
+            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            return geoServer.getService(ws, clazz);
+        }
+        return (ServiceInfo) geoServer.getService(clazz);
     }
 
+    @Override
+    protected void handleObjectPut(Object object) throws Exception {
+        String workspace = getAttribute("workspace");
+        ServiceInfo original = null;
+        if (workspace != null) {
+            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            original = geoServer.getService(ws, clazz);
+            OwsUtils.copy(object, original, clazz);
+            original.setWorkspace(ws);
+        } else {
+            original = geoServer.getService(clazz);
+        }
+        OwsUtils.copy(object, original, clazz);
+        geoServer.save(original);
+    }
+
+    
 }

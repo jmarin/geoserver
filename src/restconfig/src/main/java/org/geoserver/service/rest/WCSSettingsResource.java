@@ -4,8 +4,10 @@
  */
 package org.geoserver.service.rest;
 
-import org.geoserver.catalog.rest.AbstractCatalogResource;
 import org.geoserver.config.GeoServer;
+import org.geoserver.config.util.XStreamPersister;
+import org.geoserver.rest.format.DataFormat;
+import org.geoserver.wcs.WCSInfoImpl;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -13,19 +15,18 @@ import org.restlet.data.Response;
 /**
  * 
  * @author Juan Marin, OpenGeo
- *
+ * 
  */
-public class WCSSettingsResource extends AbstractCatalogResource {
+public class WCSSettingsResource extends ServiceSettingsResource {
 
     public WCSSettingsResource(Context context, Request request, Response response, Class clazz,
             GeoServer geoServer) {
-        super(context, request, response, clazz, geoServer.getCatalog());
+        super(context, request, response, clazz, geoServer);
     }
 
     @Override
-    protected Object handleObjectGet() throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+    protected void configurePersister(XStreamPersister persister, DataFormat format) {
+        persister.setHideFeatureTypeAttributes();
+        persister.getXStream().alias("wcsinfo", WCSInfoImpl.class);
     }
-
 }
