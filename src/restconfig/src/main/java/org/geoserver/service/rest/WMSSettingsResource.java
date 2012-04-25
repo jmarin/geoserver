@@ -1,3 +1,7 @@
+/* Copyright (c) 2001 - 2012 TOPP - www.openplans.org.  All rights reserved.
+ * This code is licensed under the GPL 2.0 license, available at the root
+ * application directory.
+ */
 package org.geoserver.service.rest;
 
 import org.geoserver.catalog.WorkspaceInfo;
@@ -13,6 +17,11 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 
+/**
+ * 
+ * @author Juan Marin, OpenGeo
+ *
+ */
 public class WMSSettingsResource extends AbstractCatalogResource {
 
     protected GeoServer geoServer;
