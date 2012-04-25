@@ -60,7 +60,7 @@ public class LocalWMSSettingsTest extends CatalogRESTTestSupport {
     }
 
     public void testPutAsJSON() throws Exception {
-        String json = "{'wmsinfo': {'id':'wms'},'workspace':{'name':'sf'},'enabled':'false','name':'WMS'}}";
+        String json = "{'wmsinfo': {'id':'wms','workspace':{'name':'sf'},'enabled':'false','name':'WMS'}}";
         MockHttpServletResponse response = putAsServletResponse("/rest/services/wms/sf/settings/",
                 json, "text/json");
         assertEquals(200, response.getStatusCode());

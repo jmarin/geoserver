@@ -45,7 +45,7 @@ public class WMSSettingsTest extends CatalogRESTTestSupport {
     }
 
     public void testPutAsJSON() throws Exception {
-        String json = "{'wmsinfo': {'id':'wms'},'enabled':'false','name':'WMS'}}";
+        String json = "{'wmsinfo': {'id':'wms','enabled':'false','name':'WMS'}}";
         MockHttpServletResponse response = putAsServletResponse("/rest/services/wms/settings/",
                 json, "text/json");
         assertEquals(200, response.getStatusCode());
@@ -55,22 +55,24 @@ public class WMSSettingsTest extends CatalogRESTTestSupport {
         JSONObject wmsinfo = (JSONObject) jsonObject.get("wmsinfo");
         assertEquals("wms", wmsinfo.get("id"));
         assertEquals("false", wmsinfo.get("enabled").toString().trim());
+        assertEquals("WMS", wmsinfo.get("name"));
     }
 
     public void testPutASXML() throws Exception {
         String xml = "<wmsinfo>"
                 + "<id>wms</id>"
-                + "<enabled>disabled</enabled>"
+                + "<enabled>false</enabled>"
                 + "<name>WMS</name><title>GeoServer Web Map Service</title>"
                 + "<maintainer>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10311</maintainer>"
                 + "</wmsinfo>";
         MockHttpServletResponse response = putAsServletResponse("/rest/services/wms/settings", xml,
                 "text/xml");
         assertEquals(200, response.getStatusCode());
-        JSON json = getAsJSON("/rest/services/wms/settings.json");
-        JSONObject jsonObject = (JSONObject) json;
-        assertNotNull(jsonObject);
-        JSONObject wmsinfo = (JSONObject) jsonObject.get("wmsinfo");
-        assertEquals("false", wmsinfo.get("enabled").toString().trim());
+        
+        Document dom = getAsDOM("/rest/services/wms/settings.xml");
+        assertXpathEvaluatesTo("false", "/wmsinfo/enabled", dom);
+        assertXpathEvaluatesTo("WMS", "/wmsinfo/name", dom);
+        
+        
     }
 }

@@ -59,7 +59,7 @@ public class LocalWFSSettingsTest extends CatalogRESTTestSupport {
     }
 
     public void testPutAsJSON() throws Exception {
-        String json = "{'wfsinfo': {'id':'wfs'},'workspace':{'name':'sf'},'enabled':'false','name':'WFS'}}";
+        String json = "{'wfsinfo': {'id':'wfs','workspace':{'name':'sf'},'enabled':'false','name':'WFS'}}";
         MockHttpServletResponse response = putAsServletResponse("/rest/services/wfs/sf/settings/",
                 json, "text/json");
         assertEquals(200, response.getStatusCode());

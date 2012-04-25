@@ -44,7 +44,7 @@ public class WFSSettingsTest extends CatalogRESTTestSupport {
     }
 
     public void testPutAsJSON() throws Exception {
-        String json = "{'wfsinfo': {'id':'wfs'},'enabled':'false','name':'WFS'}}";
+        String json = "{'wfsinfo': {'id':'wfs','enabled':'false','name':'WFS'}}";
         MockHttpServletResponse response = putAsServletResponse("/rest/services/wfs/settings/",
                 json, "text/json");
         assertEquals(200, response.getStatusCode());
@@ -54,6 +54,7 @@ public class WFSSettingsTest extends CatalogRESTTestSupport {
         JSONObject wfsinfo = (JSONObject) jsonObject.get("wfsinfo");
         assertEquals("wfs", wfsinfo.get("id"));
         assertEquals("false", wfsinfo.get("enabled").toString().trim());
+        assertEquals("WFS", wfsinfo.get("name"));
     }
 
     public void testPutASXML() throws Exception {
@@ -66,10 +67,8 @@ public class WFSSettingsTest extends CatalogRESTTestSupport {
         MockHttpServletResponse response = putAsServletResponse("/rest/services/wfs/settings", xml,
                 "text/xml");
         assertEquals(200, response.getStatusCode());
-        JSON json = getAsJSON("/rest/services/wfs/settings.json");
-        JSONObject jsonObject = (JSONObject) json;
-        assertNotNull(jsonObject);
-        JSONObject wfsinfo = (JSONObject) jsonObject.get("wfsinfo");
-        assertEquals("false", wfsinfo.get("enabled").toString().trim());
+        Document dom = getAsDOM("/rest/services/wfs/settings.xml");
+        assertXpathEvaluatesTo("false", "/wfsinfo/enabled", dom);
+        assertXpathEvaluatesTo("WFS", "/wfsinfo/name", dom);
     }
 }
