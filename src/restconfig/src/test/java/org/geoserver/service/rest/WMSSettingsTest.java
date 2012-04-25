@@ -38,9 +38,9 @@ public class WMSSettingsTest extends CatalogRESTTestSupport {
         Document dom = getAsDOM("/rest/services/wms/settings.xml");
         assertEquals("wmsinfo", dom.getDocumentElement().getLocalName());
         assertEquals(1, dom.getElementsByTagName("name").getLength());
-        assertXpathEvaluatesTo("true", "wmsinfo/enabled", dom);
+        assertXpathEvaluatesTo("true", "/wmsinfo/enabled", dom);
         assertXpathEvaluatesTo("OGC:WMS", "/wmsinfo/name", dom);
-        assertXpathEvaluatesTo("false", "wmsinfo/watermark/enabled", dom);
+        assertXpathEvaluatesTo("false", "/wmsinfo/watermark/enabled", dom);
         assertXpathEvaluatesTo("Nearest", "/wmsinfo/interpolation", dom);
     }
 
