@@ -5,7 +5,6 @@
 package org.geoserver.service.rest;
 
 import org.geoserver.catalog.WorkspaceInfo;
-import org.geoserver.catalog.rest.AbstractCatalogResource;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.ServiceInfo;
 import org.geoserver.config.util.XStreamPersister;
@@ -20,30 +19,16 @@ import org.restlet.data.Response;
 /**
  * 
  * @author Juan Marin, OpenGeo
- *
+ * 
  */
-public class WMSSettingsResource extends AbstractCatalogResource {
+public class WMSSettingsResource extends ServiceSettingsResource {
 
     protected GeoServer geoServer;
 
     public WMSSettingsResource(Context context, Request request, Response response, Class clazz,
             GeoServer geoServer) {
-        super(context, request, response, clazz, geoServer.getCatalog());
+        super(context, request, response, clazz, geoServer);
         this.geoServer = geoServer;
-    }
-
-    @Override
-    public boolean allowPut() {
-        return allowExisting();
-    }
-
-    private boolean allowExisting() {
-        String workspace = getAttribute("workspace");
-        if (workspace != null) {
-            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
-            return geoServer.getService(ws, WMSInfo.class) != null;
-        }
-        return geoServer.getService(WMSInfo.class) != null;
     }
 
     @Override
