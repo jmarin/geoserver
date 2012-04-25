@@ -4,6 +4,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -166,7 +167,6 @@ public class CatalogImplTest extends TestCase {
 
     protected void addLayerGroup() {
         addLayer();
-        addStyle();
         catalog.add(lg);
     }
 
@@ -1163,12 +1163,13 @@ public class CatalogImplTest extends TestCase {
     }
 
     public void testAddStyleWithNameConflict() throws Exception {
+        addWorkspace();
         addStyle();
 
         StyleInfo s2 = catalog.getFactory().createStyle();
         s2.setName(s.getName());
         s2.setFilename(s.getFilename());
-
+        
         try {
             catalog.add(s2);
             fail("Shoudl have failed with existing global style with same name");
@@ -1176,9 +1177,13 @@ public class CatalogImplTest extends TestCase {
         catch(IllegalArgumentException expected) {
         }
 
+        List<StyleInfo> currStyles = catalog.getStyles();
+        
         //should pass after setting workspace
         s2.setWorkspace(ws);
         catalog.add(s2);
+
+        assertFalse(new HashSet<StyleInfo>(currStyles).equals(new HashSet<StyleInfo>(catalog.getStyles())));
 
         StyleInfo s3 = catalog.getFactory().createStyle();
         s3.setName(s2.getName());
@@ -1228,10 +1233,11 @@ public class CatalogImplTest extends TestCase {
         s2.setWorkspace(ws);
         catalog.add(s2);
 
-        assertNotNull(catalog.getStyleByName("styleNameWithWorkspace"));
+        assertNull("style is not global, should't have been found",     
+                catalog.getStyleByName("styleNameWithWorkspace"));
         assertNotNull(catalog.getStyleByName(ws.getName(), "styleNameWithWorkspace"));
         assertNotNull(catalog.getStyleByName(ws, "styleNameWithWorkspace"));
-        assertNotNull(catalog.getStyleByName((WorkspaceInfo)null, "styleNameWithWorkspace"));
+        assertNull(catalog.getStyleByName((WorkspaceInfo)null, "styleNameWithWorkspace"));
 
         assertNull(catalog.getStyleByName(ws.getName(), "styleName"));
         assertNull(catalog.getStyleByName(ws, "styleName"));
@@ -1258,8 +1264,8 @@ public class CatalogImplTest extends TestCase {
         s2.setWorkspace(ws2);
         catalog.add(s2);
 
-        //will randomly return one... we should probably return null with multiple matches
-        assertNotNull(catalog.getStyleByName("foo"));
+        //none is global, so none should be returned
+        assertNull(catalog.getStyleByName("foo"));
 
         assertEquals(s1, catalog.getStyleByName(ws.getName(), "foo"));
         assertEquals(s1, catalog.getStyleByName(ws, "foo"));
@@ -1385,16 +1391,22 @@ public class CatalogImplTest extends TestCase {
         List<StyleInfo> styles = catalog.getStyles();
         assertEquals( 2 , styles.size() );
         
-        assertEquals( s.getName(), styles.get( 0 ).getName() );
-        assertEquals( "a"+s.getName(), styles.get( 1).getName() );
-        
-        //test sorting
-        Collections.sort( styles, new Comparator<StyleInfo>() {
+        //test immutability
+        Comparator<StyleInfo> comparator = new Comparator<StyleInfo>() {
 
             public int compare(StyleInfo o1, StyleInfo o2) {
                 return o1.getName().compareTo( o2.getName());
             }
-        });
+        };
+        try {
+            Collections.sort(styles, comparator);
+            fail("Expected runtime exception, immutable collection");
+        } catch (RuntimeException e) {
+            assertTrue(true);
+        }
+
+        styles = new ArrayList<StyleInfo>(styles);
+        Collections.sort(styles, comparator);
         
         assertEquals( "a"+s.getName(), styles.get( 0 ).getName() );
         assertEquals( s.getName(), styles.get( 1 ).getName() );
@@ -1535,8 +1547,7 @@ public class CatalogImplTest extends TestCase {
 
     public void testGetLayerGroupByNameWithWorkspace() {
         addLayer();
-        addStyle();
-
+        
         CatalogFactory factory = catalog.getFactory();
         LayerGroupInfo lg1 = factory.createLayerGroup();
         lg1.setName("lg");
