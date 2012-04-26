@@ -8,8 +8,10 @@ import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.catalog.rest.AbstractCatalogResource;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.ServiceInfo;
+import org.geoserver.config.impl.ServiceInfoImpl;
 import org.geoserver.ows.util.OwsUtils;
 import org.geoserver.wms.WMSInfo;
+import org.geoserver.wms.WMSInfoImpl;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -33,8 +35,17 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
     }
 
     @Override
+    public boolean allowPost() {
+        return allowNew();
+    }
+
+    @Override
     public boolean allowPut() {
         return allowExisting();
+    }
+
+    private boolean allowNew() {
+        return geoServer.getService(clazz) != null;
     }
 
     private boolean allowExisting() {
@@ -43,7 +54,7 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
             WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
             return geoServer.getService(ws, clazz) != null;
         }
-        return geoServer.getService(WMSInfo.class) != null;
+        return geoServer.getService(clazz) != null;
     }
 
     @Override
@@ -54,6 +65,37 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
             return geoServer.getService(ws, clazz);
         }
         return (ServiceInfo) geoServer.getService(clazz);
+    }
+
+    @Override
+    protected String handleObjectPost(Object object) throws Exception {
+        String name = "";
+        String workspace = getAttribute("workspace");
+        ServiceInfo original = null;
+        // ServiceInfo newInfo = null;
+        ServiceInfoImpl newInfo = null;
+        if (workspace != null) {
+            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            if (geoServer.getService(ws, clazz) != null) {
+                throw new Exception(
+                        "Service information already exists, creation of a new object is not allowed");
+            }
+            original = geoServer.getService(clazz);
+            ServiceInfo serviceInfo = (ServiceInfo) object;
+            name = serviceInfo.getName();
+            if (name == null) {
+                throw new Exception("Service name cannot be null");
+            }
+            if (serviceInfo instanceof WMSInfo) {
+                newInfo = new WMSInfoImpl();
+                newInfo.setId("");
+                OwsUtils.copy(geoServer.getService(WMSInfo.class), (WMSInfo) newInfo, WMSInfo.class);
+            }
+            OwsUtils.copy(object, newInfo, clazz);
+            geoServer.add(newInfo);
+            geoServer.save(newInfo);
+        }
+        return name;
     }
 
     @Override
@@ -72,5 +114,4 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
         geoServer.save(original);
     }
 
-    
 }
