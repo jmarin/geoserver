@@ -72,7 +72,6 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
         String name = "";
         String workspace = getAttribute("workspace");
         ServiceInfo original = null;
-        // ServiceInfo newInfo = null;
         ServiceInfoImpl newInfo = null;
         if (workspace != null) {
             WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
@@ -86,14 +85,11 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
             if (name == null) {
                 throw new Exception("Service name cannot be null");
             }
-            if (serviceInfo instanceof WMSInfo) {
-                newInfo = new WMSInfoImpl();
-                newInfo.setId("");
-                OwsUtils.copy(geoServer.getService(WMSInfo.class), (WMSInfo) newInfo, WMSInfo.class);
-            }
+            newInfo = geoServer.getFactory().create(clazz);
+            OwsUtils.copy(geoServer.getService(clazz), newInfo, clazz);
+            newInfo.setId(null);
             OwsUtils.copy(object, newInfo, clazz);
             geoServer.add(newInfo);
-            geoServer.save(newInfo);
         }
         return name;
     }
