@@ -56,6 +56,37 @@ public class LocalWCSSettingsTest extends CatalogRESTTestSupport {
         assertXpathEvaluatesTo("false", "/wcsinfo/verbose", dom);
     }
 
+    public void testPostAsJSON() throws Exception {
+        String input = "{'wcsinfo': {'id' : 'wcs', 'name' : 'WCS', 'workspace': {'name': 'sf'},'enabled': 'true'}}";
+        MockHttpServletResponse response = putAsServletResponse("/rest/services/wcs/sf/settings/",
+                input, "text/json");
+        assertEquals(200, response.getStatusCode());
+        JSON json = getAsJSON("/rest/services/wcs/sf/settings.json");
+        JSONObject jsonObject = (JSONObject) json;
+        assertNotNull(jsonObject);
+        JSONObject wmsinfo = (JSONObject) jsonObject.get("wcsinfo");
+        assertEquals("wcs", wmsinfo.get("id"));
+        assertEquals("WCS", wmsinfo.get("name"));
+        JSONObject workspace = (JSONObject) wmsinfo.get("workspace");
+        assertNotNull(workspace);
+        assertEquals("sf", workspace.get("name"));
+    }
+
+    public void testPostAsXML() throws Exception {
+        String xml = "<wcsinfo>" + "<id>wcs</id>" + "<workspace>" + "<name>sf</name>"
+                + "</workspace>" + "<name>OGC:WCS</name>" + "<enabled>false</enabled>"
+                + "</wcsinfo>";
+        MockHttpServletResponse response = putAsServletResponse("/rest/services/wcs/sf/settings",
+                xml, "text/xml");
+        assertEquals(200, response.getStatusCode());
+
+        Document dom = getAsDOM("/rest/services/wcs/sf/settings.xml");
+        assertEquals("wcsinfo", dom.getDocumentElement().getLocalName());
+        assertXpathEvaluatesTo("false", "/wcsinfo/enabled", dom);
+        assertXpathEvaluatesTo("sf", "/wcsinfo/workspace/name", dom);
+        assertXpathEvaluatesTo("OGC:WCS", "/wcsinfo/name", dom);
+    }
+
     public void testPutAsJSON() throws Exception {
         String json = "{'wcsinfo': {'id':'wcs','workspace':{'name':'sf'},'enabled':'false','name':'WCS'}}";
         MockHttpServletResponse response = putAsServletResponse("/rest/services/wcs/sf/settings/",
@@ -79,4 +110,10 @@ public class LocalWCSSettingsTest extends CatalogRESTTestSupport {
         assertXpathEvaluatesTo("false", "/wcsinfo/enabled", dom);
     }
 
+    public void testDelete() throws Exception {
+        assertEquals(200, deleteAsServletResponse("/rest/services/wcs/sf/settings").getStatusCode());
+        JSON json = getAsJSON("/rest/services/wcs/sf/settings.json");
+        JSONObject jsonObject = (JSONObject) json;
+        assertEquals("", jsonObject.get("null"));
+    }
 }
