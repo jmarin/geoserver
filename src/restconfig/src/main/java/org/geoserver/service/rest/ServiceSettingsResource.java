@@ -10,11 +10,13 @@ import org.geoserver.config.GeoServer;
 import org.geoserver.config.ServiceInfo;
 import org.geoserver.config.impl.ServiceInfoImpl;
 import org.geoserver.ows.util.OwsUtils;
+import org.geoserver.rest.RestletException;
 import org.geoserver.wms.WMSInfo;
 import org.geoserver.wms.WMSInfoImpl;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 
 /**
  * 
@@ -42,6 +44,11 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
     @Override
     public boolean allowPut() {
         return allowExisting();
+    }
+
+    @Override
+    public boolean allowDelete() {
+        return allowNew();
     }
 
     private boolean allowNew() {
@@ -76,14 +83,16 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
         if (workspace != null) {
             WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
             if (geoServer.getService(ws, clazz) != null) {
-                throw new Exception(
-                        "Service information already exists, creation of a new object is not allowed");
+                throw new RestletException(
+                        "Service information already exists, creation of a new object is not allowed",
+                        Status.CLIENT_ERROR_FORBIDDEN);
             }
             original = geoServer.getService(clazz);
             ServiceInfo serviceInfo = (ServiceInfo) object;
             name = serviceInfo.getName();
             if (name == null) {
-                throw new Exception("Service name cannot be null");
+                throw new RestletException("Service name cannot be null",
+                        Status.CLIENT_ERROR_BAD_REQUEST);
             }
             newInfo = geoServer.getFactory().create(clazz);
             OwsUtils.copy(geoServer.getService(clazz), newInfo, clazz);
@@ -108,6 +117,18 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
         }
         OwsUtils.copy(object, original, clazz);
         geoServer.save(original);
+    }
+
+    @Override
+    protected void handleObjectDelete() throws Exception {
+        String workspace = getAttribute("workspace");
+        if (workspace != null) {
+            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            ServiceInfo serviceInfo = geoServer.getService(ws, clazz);
+            if (serviceInfo != null) {
+                geoServer.remove(serviceInfo);
+            }
+        }
     }
 
 }
