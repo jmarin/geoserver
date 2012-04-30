@@ -1,5 +1,6 @@
 package org.geoserver.rest;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 
@@ -53,13 +54,49 @@ public class SettingsTest extends CatalogRESTTestSupport {
         assertEquals("20001", contactInfo.get("addressPostalCode").toString());
     }
 
+    public void testGetAsXML() throws Exception {
+        Document dom = getAsDOM("/rest/settings.xml");
+        assertEquals("global", dom.getDocumentElement().getLocalName());
+        assertXpathEvaluatesTo("United States", "/global/settings/contact/addressCountry", dom);
+        assertXpathEvaluatesTo("Washington", "/global/settings/contact/addressCity", dom);
+        assertXpathEvaluatesTo("1600 Pennsylvania Avenue", "/global/settings/contact/address", dom);
+        assertXpathEvaluatesTo("DC", "/global/settings/contact/addressState", dom);
+        assertXpathEvaluatesTo("20001", "/global/settings/contact/addressPostalCode", dom);
+    }
+
+    public void testPutAsJSON() throws Exception {
+        String inputJson = "{'global': " + "{'settings':" + "{'contact':" + "{'id': 'contact',"
+                + "'address': '500 Market Street'," + "'addressCity': 'Philadelphia',"
+                + "'addressCountry': 'United States'," + "'addressPostalCode': '19106',"
+                + "'addressState': 'PA'" + "}" + "}" + "}" + "}";
+        MockHttpServletResponse response = putAsServletResponse("/rest/settings/", inputJson,
+                "text/json");
+        assertEquals(200, response.getStatusCode());
+        JSON jsonMod = getAsJSON("/rest/settings.json");
+        JSONObject jsonObject = (JSONObject) jsonMod;
+         assertNotNull(jsonObject);
+        JSON json = getAsJSON("/rest/settings.json");
+        JSONObject jsonObject2 = (JSONObject) json;
+        assertNotNull(jsonObject2);
+        JSONObject global = jsonObject2.getJSONObject("global");
+        assertNotNull(global);
+        JSONObject settings = global.getJSONObject("settings");
+        assertNotNull(settings);
+        JSONObject contactInfo = settings.getJSONObject("contact");
+        assertEquals("United States", contactInfo.get("addressCountry"));
+        assertEquals("500 Market Street", contactInfo.get("address"));
+        assertEquals("Philadelphia", contactInfo.get("addressCity"));
+        assertEquals("PA", contactInfo.get("addressState"));
+        assertEquals("19106", contactInfo.get("addressPostalCode").toString());
+    }
+
     public void testPutAsXML() throws Exception {
-        String xml = "<global>" + "<settings>" + "<contact>" + "<address>500 Market Street, Philadelphia, PA</address>"
+        String xml = "<global>" + "<settings>" + "<contact>"
+                + "<address>500 Market Street</address>"
                 + "<addressCity>Philadelphia</addressCity>"
                 + "<addressCountry>United States</addressCountry>"
                 + "<addressPostalCode>19106</addressPostalCode>"
-                + "<addressState>PA</addressState>"
-                + "<addressType>Street</addressType>"
+                + "<addressState>PA</addressState>" + "<addressType>Street</addressType>"
                 + "<contactEmail>chief.geographer@mail.com</contactEmail>"
                 + "<contactOrganization>GeoServer</contactOrganization>"
                 + "<contactPerson>ContactPerson</contactPerson>"
@@ -76,7 +113,7 @@ public class SettingsTest extends CatalogRESTTestSupport {
         assertNotNull(settings);
         JSONObject contactInfo = settings.getJSONObject("contact");
         assertEquals("United States", contactInfo.get("addressCountry"));
-        assertEquals("500 Market Street, Philadelphia, PA", contactInfo.get("address"));
+        assertEquals("500 Market Street", contactInfo.get("address"));
         assertEquals("Philadelphia", contactInfo.get("addressCity"));
         assertEquals("PA", contactInfo.get("addressState"));
         assertEquals("19106", contactInfo.get("addressPostalCode").toString());
