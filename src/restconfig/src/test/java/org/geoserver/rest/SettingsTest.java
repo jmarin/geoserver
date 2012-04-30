@@ -36,7 +36,7 @@ public class SettingsTest extends CatalogRESTTestSupport {
         geoServer.save(geoServerInfo);
     }
 
-    public void testGetContactInfo() throws Exception {
+    public void testGetAsJSON() throws Exception {
         JSON json = getAsJSON("/rest/settings.json");
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
@@ -82,7 +82,7 @@ public class SettingsTest extends CatalogRESTTestSupport {
         assertEquals("19106", contactInfo.get("addressPostalCode").toString());
     }
 
-    public void testDeleteContactInfo() throws Exception {
+    public void testDelete() throws Exception {
         JSON json = getAsJSON("/rest/settings.json");
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
