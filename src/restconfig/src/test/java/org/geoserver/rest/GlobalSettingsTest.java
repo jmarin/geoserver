@@ -17,7 +17,7 @@ import org.w3c.dom.Document;
 
 import com.mockrunner.mock.web.MockHttpServletResponse;
 
-public class SettingsTest extends CatalogRESTTestSupport {
+public class GlobalSettingsTest extends CatalogRESTTestSupport {
 
     protected GeoServer geoServer;
 
