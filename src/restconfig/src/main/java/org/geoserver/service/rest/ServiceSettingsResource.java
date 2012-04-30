@@ -94,7 +94,7 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
                 throw new RestletException("Service name cannot be null",
                         Status.CLIENT_ERROR_BAD_REQUEST);
             }
-            newInfo = geoServer.getFactory().create(clazz);
+            newInfo = geoServer.getFactory().create(ServiceInfoImpl.class);
             OwsUtils.copy(geoServer.getService(clazz), newInfo, clazz);
             newInfo.setId(null);
             OwsUtils.copy(object, newInfo, clazz);
