@@ -326,6 +326,15 @@
         </entry>
 
         <entry>
+            <key><value>/settings/contact</value></key>
+            <value>globalContactFinder</value>
+        </entry>
+        <entry>
+            <key><value>/settings/contact.{format}</value></key>
+            <value>globalContactFinder</value>
+        </entry>
+
+        <entry>
             <key><value>/{workspace}/settings</value></key>
             <value>localSettingsFinder</value>
         </entry>
@@ -413,6 +422,7 @@
   <bean id="layerGroupFinder2" class="org.geoserver.catalog.rest.LayerGroupFinder" parent="abstractCatalogFinder"/>
   <bean id="globalSettingsFinder" class="org.geoserver.rest.GlobalSettingsFinder" parent="abstractGeoServerFinder"/>
   <bean id="localSettingsFinder" class="org.geoserver.rest.LocalSettingsFinder" parent="abstractGeoServerFinder"/>
+  <bean id="globalContactFinder" class="org.geoserver.rest.GlobalContactFinder" parent="abstractGeoServerFinder"/>
   <bean id="wmsSettingsFinder" class="org.geoserver.service.rest.WMSSettingsFinder" parent="abstractGeoServerFinder"/>
   <bean id="wfsSettingsFinder" class="org.geoserver.service.rest.WFSSettingsFinder" parent="abstractGeoServerFinder"/>
   <bean id="wcsSettingsFinder" class="org.geoserver.service.rest.WCSSettingsFinder" parent="abstractGeoServerFinder"/>
