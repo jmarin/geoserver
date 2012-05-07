@@ -10,6 +10,7 @@ import org.geoserver.config.GeoServer;
 import org.geoserver.config.GeoServerInfo;
 import org.geoserver.config.impl.ContactInfoImpl;
 import org.geoserver.config.util.XStreamPersister;
+import org.geoserver.ows.util.OwsUtils;
 import org.geoserver.rest.format.DataFormat;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -90,9 +91,9 @@ public class GlobalContactResource extends AbstractCatalogResource {
 
     @Override
     protected void handleObjectPut(Object obj) throws Exception {
-        ContactInfo contactInfo = (ContactInfo) obj;
         GeoServerInfo geoServerInfo = geoServer.getGlobal();
-        geoServerInfo.getSettings().setContact(contactInfo);
+        ContactInfo original = geoServerInfo.getSettings().getContact();
+        OwsUtils.copy((ContactInfo)obj, original, ContactInfo.class);
         geoServer.save(geoServerInfo);
     }
 
