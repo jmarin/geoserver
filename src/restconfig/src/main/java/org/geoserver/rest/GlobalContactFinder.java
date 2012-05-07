@@ -8,12 +8,13 @@ import org.geoserver.config.ContactInfo;
 import org.geoserver.config.GeoServer;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Resource;
 
 /**
  * 
  * @author Juan Marin, OpenGeo
- *
+ * 
  */
 public class GlobalContactFinder extends AbstractGeoServerFinder {
 
@@ -23,6 +24,7 @@ public class GlobalContactFinder extends AbstractGeoServerFinder {
 
     @Override
     public Resource findTarget(Request request, Response response) {
-        return new GlobalContactResource(getContext(), request, response, ContactInfo.class, geoServer);
+        return new GlobalContactResource(getContext(), request, response, ContactInfo.class,
+                geoServer);
     }
 }
