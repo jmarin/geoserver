@@ -48,7 +48,6 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
 
     public void testGetAsJSON() throws Exception {
         JSON json = getAsJSON("/rest/sf/settings.json");
-        print(json);
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
         JSONObject settings = jsonObject.getJSONObject("settings");

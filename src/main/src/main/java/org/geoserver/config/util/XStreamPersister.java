@@ -179,6 +179,10 @@ public class XStreamPersister {
         protected void postEncodeWMSStore(WMSStoreInfo store, HierarchicalStreamWriter writer,  MarshallingContext context) {
             
         }
+
+        protected void postEncodeSettings(Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
+
+        }
     }
     
     /**
@@ -382,6 +386,9 @@ public class XStreamPersister {
         // ServiceInfo
         xs.omitField( impl(ServiceInfo.class), "geoServer" );
 
+        //SettingsInfo
+        xs.omitField(impl(SettingsInfo.class), "contact");
+
         // Converters
         xs.registerConverter(new SpaceInfoConverter());
         xs.registerConverter(new StoreInfoConverter());
@@ -394,6 +401,7 @@ public class XStreamPersister {
         xs.registerConverter(new ProxyCollectionConverter( xs.getMapper() ) );
         xs.registerConverter(new VirtualTableConverter());
         xs.registerConverter(new KeywordInfoConverter());
+        xs.registerConverter(new SettingsInfoConverter());
 
         // register VirtulaTable handling
         registerBreifMapComplexType("virtualTable", VirtualTable.class);
@@ -1897,4 +1905,17 @@ public class XStreamPersister {
         }
 
     }
+
+
+    class SettingsInfoConverter extends AbstractReflectionConverter {
+        public SettingsInfoConverter() {
+            super(SettingsInfo.class);
+        }
+
+        @Override
+        protected void postDoMarshal(Object result, HierarchicalStreamWriter writer, MarshallingContext context) {
+            callback.postEncodeSettings((SettingsInfo) result, writer, context);
+        }
+    }
+
 }

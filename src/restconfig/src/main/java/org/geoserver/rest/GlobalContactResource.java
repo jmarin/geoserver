@@ -5,7 +5,6 @@ import org.geoserver.config.ContactInfo;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.util.XStreamPersister;
 import org.geoserver.rest.format.DataFormat;
-import org.geoserver.wfs.WFSInfoImpl;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
