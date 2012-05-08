@@ -4,15 +4,8 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 
-import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.catalog.rest.CatalogRESTTestSupport;
-import org.geoserver.config.ContactInfo;
 import org.geoserver.config.GeoServer;
-import org.geoserver.config.GeoServerInfo;
-import org.geoserver.config.SettingsInfo;
-import org.geoserver.config.impl.ContactInfoImpl;
-import org.geoserver.platform.GeoServerExtensions;
-import org.geoserver.test.GeoServerTestSupport;
 import org.w3c.dom.Document;
 
 import com.mockrunner.mock.web.MockHttpServletResponse;
@@ -24,17 +17,6 @@ public class GlobalSettingsTest extends CatalogRESTTestSupport {
     @Override
     protected void oneTimeSetUp() throws Exception {
         super.oneTimeSetUp();
-        geoServer = GeoServerExtensions.bean(GeoServer.class, applicationContext);
-        ContactInfo contactInfo = new ContactInfoImpl();
-        contactInfo.setAddress("1600 Pennsylvania Avenue");
-        contactInfo.setAddressCity("Washington");
-        contactInfo.setAddressPostalCode("20001");
-        contactInfo.setAddressCountry("United States");
-        contactInfo.setAddressState("DC");
-        GeoServerInfo geoServerInfo = geoServer.getGlobal();
-        SettingsInfo settingsInfo = geoServerInfo.getSettings();
-        settingsInfo.setContact(contactInfo);
-        geoServer.save(geoServerInfo);
     }
 
     public void testGetAsJSON() throws Exception {
@@ -43,80 +25,112 @@ public class GlobalSettingsTest extends CatalogRESTTestSupport {
         assertNotNull(jsonObject);
         JSONObject global = jsonObject.getJSONObject("global");
         assertNotNull(global);
+        assertEquals("true", global.get("globalServices").toString().trim());
+        assertEquals("1024", global.get("xmlPostRequestLogBufferSize").toString().trim());
+
         JSONObject settings = global.getJSONObject("settings");
         assertNotNull(settings);
-        JSONObject contactInfo = settings.getJSONObject("contact");
-        assertNotNull(contactInfo);
-        assertEquals("United States", contactInfo.get("addressCountry"));
-        assertEquals("1600 Pennsylvania Avenue", contactInfo.get("address"));
-        assertEquals("Washington", contactInfo.get("addressCity"));
-        assertEquals("DC", contactInfo.get("addressState"));
-        assertEquals("20001", contactInfo.get("addressPostalCode").toString());
+        assertEquals("UTF-8", settings.get("charset"));
+        assertEquals("8", settings.get("numDecimals").toString().trim());
+        assertEquals("http://geoserver.org", settings.get("onlineResource"));
+
+        JSONObject jaiInfo = global.getJSONObject("jai");
+        assertNotNull(jaiInfo);
+        assertEquals("false", jaiInfo.get("allowInterpolation").toString().trim());
+        assertEquals("0.75", jaiInfo.get("memoryThreshold").toString().trim());
+        assertEquals("false", jaiInfo.get("imageIOCache").toString().trim());
+
+        JSONObject covInfo = global.getJSONObject("coverageAccess");
+        assertEquals("UNBOUNDED", covInfo.get("queueType"));
     }
 
     public void testGetAsXML() throws Exception {
         Document dom = getAsDOM("/rest/settings.xml");
         assertEquals("global", dom.getDocumentElement().getLocalName());
-        assertXpathEvaluatesTo("United States", "/global/settings/contact/addressCountry", dom);
-        assertXpathEvaluatesTo("Washington", "/global/settings/contact/addressCity", dom);
-        assertXpathEvaluatesTo("1600 Pennsylvania Avenue", "/global/settings/contact/address", dom);
-        assertXpathEvaluatesTo("DC", "/global/settings/contact/addressState", dom);
-        assertXpathEvaluatesTo("20001", "/global/settings/contact/addressPostalCode", dom);
+        assertXpathEvaluatesTo("true", "/global/globalServices", dom);
+        assertXpathEvaluatesTo("1024", "/global/xmlPostRequestLogBufferSize", dom);
+        assertXpathEvaluatesTo("UTF-8", "/global/settings/charset", dom);
+        assertXpathEvaluatesTo("8", "/global/settings/numDecimals", dom);
+        assertXpathEvaluatesTo("http://geoserver.org", "/global/settings/onlineResource", dom);
+        assertXpathEvaluatesTo("false", "/global/jai/allowInterpolation", dom);
+        assertXpathEvaluatesTo("0.75", "/global/jai/memoryThreshold", dom);
+        assertXpathEvaluatesTo("false", "/global/jai/imageIOCache", dom);
+        assertXpathEvaluatesTo("UNBOUNDED", "/global/coverageAccess/queueType", dom);
+
     }
 
     public void testPutAsJSON() throws Exception {
-        String inputJson = "{'global': " + "{'settings':" + "{'contact':" + "{'id': 'contact',"
-                + "'address': '500 Market Street'," + "'addressCity': 'Philadelphia',"
-                + "'addressCountry': 'United States'," + "'addressPostalCode': '19106',"
-                + "'addressState': 'PA'" + "}" + "}" + "}" + "}";
+        String inputJson = "{'global':"
+                + "{'settings':"
+                + "{'charset':'UTF-8','numDecimals':10,'onlineResource':'http://geoserver2.org','verbose':true,'verboseExceptions':true},"
+                + "'jai':{'allowInterpolation':true,'recycling':true,'tilePriority':5,'tileThreads':7,'memoryCapacity':0.5,'memoryThreshold':0.75,"
+                + "'imageIOCache':false,'pngAcceleration':true,'jpegAcceleration':true,'allowNativeMosaic':false},"
+                + "'coverageAccess':{'maxPoolSize':10,'corePoolSize':5,'keepAliveTime':30000,'queueType':'UNBOUNDED','imageIOCacheThreshold':10240},"
+                + "'updateSequence':97,'featureTypeCacheSize':0,'globalServices':true,'xmlPostRequestLogBufferSize':1024}}";
         MockHttpServletResponse response = putAsServletResponse("/rest/settings/", inputJson,
                 "text/json");
-        assertEquals(200, response.getStatusCode());
-        JSON jsonMod = getAsJSON("/rest/settings.json");
-        JSONObject jsonObject = (JSONObject) jsonMod;
-         assertNotNull(jsonObject);
-        JSON json = getAsJSON("/rest/settings.json");
-        JSONObject jsonObject2 = (JSONObject) json;
-        assertNotNull(jsonObject2);
-        JSONObject global = jsonObject2.getJSONObject("global");
-        assertNotNull(global);
-        JSONObject settings = global.getJSONObject("settings");
-        assertNotNull(settings);
-        JSONObject contactInfo = settings.getJSONObject("contact");
-        assertEquals("United States", contactInfo.get("addressCountry"));
-        assertEquals("500 Market Street", contactInfo.get("address"));
-        assertEquals("Philadelphia", contactInfo.get("addressCity"));
-        assertEquals("PA", contactInfo.get("addressState"));
-        assertEquals("19106", contactInfo.get("addressPostalCode").toString());
-    }
-
-    public void testPutAsXML() throws Exception {
-        String xml = "<global>" + "<settings>" + "<contact>"
-                + "<address>500 Market Street</address>"
-                + "<addressCity>Philadelphia</addressCity>"
-                + "<addressCountry>United States</addressCountry>"
-                + "<addressPostalCode>19106</addressPostalCode>"
-                + "<addressState>PA</addressState>" + "<addressType>Street</addressType>"
-                + "<contactEmail>chief.geographer@mail.com</contactEmail>"
-                + "<contactOrganization>GeoServer</contactOrganization>"
-                + "<contactPerson>ContactPerson</contactPerson>"
-                + "<contactPosition>Chief Geographer</contactPosition>" + "</contact>"
-                + "</settings>" + "</global>";
-        MockHttpServletResponse response = putAsServletResponse("/rest/settings", xml, "text/xml");
         assertEquals(200, response.getStatusCode());
         JSON json = getAsJSON("/rest/settings.json");
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
         JSONObject global = jsonObject.getJSONObject("global");
         assertNotNull(global);
+        assertEquals("true", global.get("globalServices").toString().trim());
+        assertEquals("1024", global.get("xmlPostRequestLogBufferSize").toString().trim());
+
         JSONObject settings = global.getJSONObject("settings");
         assertNotNull(settings);
-        JSONObject contactInfo = settings.getJSONObject("contact");
-        assertEquals("United States", contactInfo.get("addressCountry"));
-        assertEquals("500 Market Street", contactInfo.get("address"));
-        assertEquals("Philadelphia", contactInfo.get("addressCity"));
-        assertEquals("PA", contactInfo.get("addressState"));
-        assertEquals("19106", contactInfo.get("addressPostalCode").toString());
+        assertEquals("UTF-8", settings.get("charset"));
+        assertEquals("10", settings.get("numDecimals").toString().trim());
+        assertEquals("http://geoserver2.org", settings.get("onlineResource"));
+
+        JSONObject jaiInfo = global.getJSONObject("jai");
+        assertNotNull(jaiInfo);
+        assertEquals("true", jaiInfo.get("allowInterpolation").toString().trim());
+        assertEquals("0.75", jaiInfo.get("memoryThreshold").toString().trim());
+        assertEquals("true", jaiInfo.get("recycling").toString().trim());
+
+        JSONObject covInfo = global.getJSONObject("coverageAccess");
+        assertEquals("UNBOUNDED", covInfo.get("queueType"));
+
+    }
+
+    public void testPutAsXML() throws Exception {
+        String xml = "<global>"
+                + "<settings>"
+                + "<charset>UTF-8</charset>"
+                + "<numDecimals>10</numDecimals>"
+                + "<onlineResource>http://geoserver.org</onlineResource>"
+                + "<verbose>false</verbose>"
+                + "<verboseExceptions>false</verboseExceptions>"
+                + "</settings>" + "<jai>" + "<allowInterpolation>true</allowInterpolation>"
+                + "<recycling>false</recycling>" + "<tilePriority>5</tilePriority>"
+                + "<tileThreads>7</tileThreads>" + "<memoryCapacity>0.5</memoryCapacity>"
+                + "<memoryThreshold>0.85</memoryThreshold>" + "<imageIOCache>false</imageIOCache>"
+                + "<pngAcceleration>true</pngAcceleration>"
+                + "<jpegAcceleration>true</jpegAcceleration>"
+                + "<allowNativeMosaic>false</allowNativeMosaic>" + "</jai>" + "<coverageAccess>"
+                + "<maxPoolSize>10</maxPoolSize>" + "<corePoolSize>5</corePoolSize>"
+                + "<keepAliveTime>30000</keepAliveTime>" + "<queueType>UNBOUNDED</queueType>"
+                + "<imageIOCacheThreshold>10240</imageIOCacheThreshold>" + "</coverageAccess>"
+                + "<updateSequence>97</updateSequence>"
+                + "<featureTypeCacheSize>0</featureTypeCacheSize>"
+                + "<globalServices>false</globalServices>"
+                + "<xmlPostRequestLogBufferSize>2048</xmlPostRequestLogBufferSize>" + "</global>";
+
+        MockHttpServletResponse response = putAsServletResponse("/rest/settings/", xml, "text/xml");
+        assertEquals(200, response.getStatusCode());
+        Document dom = getAsDOM("/rest/settings.xml");
+        assertEquals("global", dom.getDocumentElement().getLocalName());
+        assertXpathEvaluatesTo("false", "/global/globalServices", dom);
+        assertXpathEvaluatesTo("2048", "/global/xmlPostRequestLogBufferSize", dom);
+        assertXpathEvaluatesTo("UTF-8", "/global/settings/charset", dom);
+        assertXpathEvaluatesTo("10", "/global/settings/numDecimals", dom);
+        assertXpathEvaluatesTo("http://geoserver.org", "/global/settings/onlineResource", dom);
+        assertXpathEvaluatesTo("true", "/global/jai/allowInterpolation", dom);
+        assertXpathEvaluatesTo("0.85", "/global/jai/memoryThreshold", dom);
+        assertXpathEvaluatesTo("false", "/global/jai/imageIOCache", dom);
+        assertXpathEvaluatesTo("UNBOUNDED", "/global/coverageAccess/queueType", dom);
     }
 
     public void testDelete() throws Exception {
@@ -124,13 +138,28 @@ public class GlobalSettingsTest extends CatalogRESTTestSupport {
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
         assertEquals(200, deleteAsServletResponse("/rest/settings").getStatusCode());
-        json = getAsJSON("/rest/settings.json");
-        assertNotNull(json);
-        JSONObject global = jsonObject.getJSONObject("global");
+        JSON jsonDeleted = getAsJSON("/rest/settings.json");
+        JSONObject jsonObject2 = (JSONObject) jsonDeleted;
+        assertNotNull(jsonObject2);
+        JSONObject global = jsonObject2.getJSONObject("global");
         assertNotNull(global);
+        assertEquals("true", global.get("globalServices").toString().trim());
+        assertEquals("1024", global.get("xmlPostRequestLogBufferSize").toString().trim());
+
         JSONObject settings = global.getJSONObject("settings");
         assertNotNull(settings);
-        JSONObject contactInfo = settings.getJSONObject("contact");
-        assertEquals("contact", contactInfo.get("id"));
+        assertEquals("UTF-8", settings.get("charset"));
+        assertEquals("8", settings.get("numDecimals").toString().trim());
+        assertEquals("http://geoserver.org", settings.get("onlineResource"));
+
+        JSONObject jaiInfo = global.getJSONObject("jai");
+        assertNotNull(jaiInfo);
+        assertEquals("false", jaiInfo.get("allowInterpolation").toString().trim());
+        assertEquals("0.75", jaiInfo.get("memoryThreshold").toString().trim());
+        assertEquals("false", jaiInfo.get("imageIOCache").toString().trim());
+
+        JSONObject covInfo = global.getJSONObject("coverageAccess");
+        assertEquals("UNBOUNDED", covInfo.get("queueType"));
+
     }
 }

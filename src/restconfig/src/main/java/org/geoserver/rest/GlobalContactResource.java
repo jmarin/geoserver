@@ -100,7 +100,19 @@ public class GlobalContactResource extends AbstractCatalogResource {
     @Override
     protected void handleObjectDelete() throws Exception {
         GeoServerInfo geoServerInfo = geoServer.getGlobal();
-        geoServerInfo.getSettings().setContact(new ContactInfoImpl());
+        ContactInfo contactInfo = geoServerInfo.getSettings().getContact();
+        contactInfo.setAddress("");
+        contactInfo.setAddressCity("");
+        contactInfo.setAddressCountry("");
+        contactInfo.setAddressPostalCode("");
+        contactInfo.setAddressState("");
+        contactInfo.setAddressType("");
+        contactInfo.setContactEmail("");
+        contactInfo.setContactFacsimile("");
+        contactInfo.setContactOrganization("");
+        contactInfo.setContactPosition("");
+        contactInfo.setContactVoice("");
+        contactInfo.setOnlineResource("");
         geoServer.save(geoServerInfo);
     }
 
