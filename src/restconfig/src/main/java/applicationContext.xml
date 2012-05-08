@@ -316,6 +316,16 @@
           <key><value>/fonts.{format}</value></key>
           <value>fontFinder</value>
         </entry>
+        
+        <entry>
+            <key><value>/settings/contact</value></key>
+            <value>globalContactFinder</value>
+        </entry>
+        <entry>
+            <key><value>/settings/contact.{format}</value></key>
+            <value>globalContactFinder</value>
+        </entry>
+        
   </map>
 </property>
 </bean>
@@ -353,5 +363,10 @@
 
   <!-- admin request callback -->
   <bean id="adminRequestRestCallback" class="org.geoserver.catalog.rest.AdminRequestCallback"/>
+
+  <bean id="abstractGeoServerFinder" class="org.geoserver.rest.AbstractGeoServerFinder" abstract="true">
+    <constructor-arg ref="geoServer"></constructor-arg>
+  </bean>
   
+  <bean id="globalContactFinder" class="org.geoserver.rest.GlobalContactFinder" parent="abstractGeoServerFinder"/>
 </beans>
