@@ -325,6 +325,14 @@
             <key><value>/settings/contact.{format}</value></key>
             <value>globalContactFinder</value>
         </entry>
+        <entry>
+            <key><value>/settings.{format}</value></key>
+            <value>globalSettingsFinder</value>
+        </entry>
+        <entry>
+            <key><value>/settings</value></key>
+            <value>globalSettingsFinder</value>
+        </entry>
         
   </map>
 </property>
@@ -369,4 +377,5 @@
   </bean>
   
   <bean id="globalContactFinder" class="org.geoserver.rest.GlobalContactFinder" parent="abstractGeoServerFinder"/>
+  <bean id="globalSettingsFinder" class="org.geoserver.rest.GlobalSettingsFinder" parent="abstractGeoServerFinder"/>
 </beans>
