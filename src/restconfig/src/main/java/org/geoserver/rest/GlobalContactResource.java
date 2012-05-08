@@ -8,6 +8,7 @@ import org.geoserver.catalog.rest.AbstractCatalogResource;
 import org.geoserver.config.ContactInfo;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.GeoServerInfo;
+import org.geoserver.config.SettingsInfo;
 import org.geoserver.config.impl.ContactInfoImpl;
 import org.geoserver.config.util.XStreamPersister;
 import org.geoserver.ows.util.OwsUtils;
@@ -44,7 +45,8 @@ public class GlobalContactResource extends AbstractCatalogResource {
 
     @Override
     public boolean allowDelete() {
-        return allowExisting();
+        return true;
+        //return allowExisting();
     }
 
     private boolean allowExisting() {
@@ -93,26 +95,14 @@ public class GlobalContactResource extends AbstractCatalogResource {
     protected void handleObjectPut(Object obj) throws Exception {
         GeoServerInfo geoServerInfo = geoServer.getGlobal();
         ContactInfo original = geoServerInfo.getSettings().getContact();
-        OwsUtils.copy((ContactInfo)obj, original, ContactInfo.class);
+        OwsUtils.copy((ContactInfo) obj, original, ContactInfo.class);
         geoServer.save(geoServerInfo);
     }
 
     @Override
     protected void handleObjectDelete() throws Exception {
         GeoServerInfo geoServerInfo = geoServer.getGlobal();
-        ContactInfo contactInfo = geoServerInfo.getSettings().getContact();
-        contactInfo.setAddress("");
-        contactInfo.setAddressCity("");
-        contactInfo.setAddressCountry("");
-        contactInfo.setAddressPostalCode("");
-        contactInfo.setAddressState("");
-        contactInfo.setAddressType("");
-        contactInfo.setContactEmail("");
-        contactInfo.setContactFacsimile("");
-        contactInfo.setContactOrganization("");
-        contactInfo.setContactPosition("");
-        contactInfo.setContactVoice("");
-        contactInfo.setOnlineResource("");
+        geoServerInfo.getSettings().setContact(null);
         geoServer.save(geoServerInfo);
     }
 
