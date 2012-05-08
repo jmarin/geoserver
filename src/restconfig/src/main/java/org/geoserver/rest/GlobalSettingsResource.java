@@ -72,9 +72,11 @@ public class GlobalSettingsResource extends AbstractCatalogResource {
     @Override
     protected void configurePersister(XStreamPersister persister, DataFormat format) {
         persister.setCallback(new XStreamPersister.Callback() {
-            protected void postEncodeSettings(Object obj, HierarchicalStreamWriter writer,
+            protected void postEncodeGeoServerInfo(Object obj, HierarchicalStreamWriter writer,
                     MarshallingContext context) {
+                writer.startNode("contactinfo");
                 encodeLink("/settings/contact", writer);
+                writer.endNode();
             }
         });
     }
