@@ -183,6 +183,10 @@ public class XStreamPersister {
         protected void postEncodeSettings(Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
 
         }
+        
+        protected void postEncodeGeoServerInfo (Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
+
+        }
     }
     
     /**
@@ -402,6 +406,7 @@ public class XStreamPersister {
         xs.registerConverter(new VirtualTableConverter());
         xs.registerConverter(new KeywordInfoConverter());
         xs.registerConverter(new SettingsInfoConverter());
+        xs.registerConverter(new GeoServerInfoConverter());
 
         // register VirtulaTable handling
         registerBreifMapComplexType("virtualTable", VirtualTable.class);
@@ -1918,4 +1923,15 @@ public class XStreamPersister {
         }
     }
 
+    class GeoServerInfoConverter extends AbstractReflectionConverter {
+        public GeoServerInfoConverter() {
+            super(GeoServerInfo.class);
+        }
+        
+        @Override
+        protected void postDoMarshal(Object result, HierarchicalStreamWriter writer, MarshallingContext context) {
+            callback.postEncodeGeoServerInfo((GeoServerInfo)result, writer, context);
+        }
+    }
+    
 }
