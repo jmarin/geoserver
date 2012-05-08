@@ -180,10 +180,6 @@ public class XStreamPersister {
             
         }
 
-        protected void postEncodeSettings(Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
-
-        }
-        
         protected void postEncodeGeoServerInfo (Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
 
         }
@@ -405,7 +401,6 @@ public class XStreamPersister {
         xs.registerConverter(new ProxyCollectionConverter( xs.getMapper() ) );
         xs.registerConverter(new VirtualTableConverter());
         xs.registerConverter(new KeywordInfoConverter());
-        xs.registerConverter(new SettingsInfoConverter());
         xs.registerConverter(new GeoServerInfoConverter());
 
         // register VirtulaTable handling
@@ -1911,19 +1906,7 @@ public class XStreamPersister {
 
     }
 
-
-    class SettingsInfoConverter extends AbstractReflectionConverter {
-        public SettingsInfoConverter() {
-            super(SettingsInfo.class);
-        }
-
-        @Override
-        protected void postDoMarshal(Object result, HierarchicalStreamWriter writer, MarshallingContext context) {
-            callback.postEncodeSettings((SettingsInfo) result, writer, context);
-        }
-    }
-
-    class GeoServerInfoConverter extends AbstractReflectionConverter {
+        class GeoServerInfoConverter extends AbstractReflectionConverter {
         public GeoServerInfoConverter() {
             super(GeoServerInfo.class);
         }
