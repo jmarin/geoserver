@@ -5,7 +5,7 @@ import java.io.File;
 import org.geoserver.data.test.MockData;
 import org.geoserver.test.GeoServerTestSupport;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.factory.epsg.CoordinateOperationFactoryUsingWKT;
+//import org.geotools.referencing.factory.epsg.CoordinateOperationFactoryUsingWKT;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.ConcatenatedOperation;
 import org.opengis.referencing.operation.CoordinateOperation;
