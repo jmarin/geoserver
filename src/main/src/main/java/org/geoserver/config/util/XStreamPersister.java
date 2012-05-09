@@ -179,6 +179,15 @@ public class XStreamPersister {
         protected void postEncodeWMSStore(WMSStoreInfo store, HierarchicalStreamWriter writer,  MarshallingContext context) {
             
         }
+
+        protected void postEncodeGeoServerInfo (Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
+
+        }
+
+        protected void postEncodeSettings (Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
+
+        }
+
     }
     
     /**
@@ -280,6 +289,7 @@ public class XStreamPersister {
         xs.aliasField("abstract", ResourceInfoImpl.class, "_abstract" );
         xs.alias("AuthorityURL", AuthorityURLInfo.class);
         xs.alias("Identifier", LayerIdentifierInfo.class);
+        xs.alias("ContactInfo", ContactInfo.class);
         
         // GeoServerInfo
         xs.omitField(impl(GeoServerInfo.class), "clientProperties");
@@ -381,6 +391,8 @@ public class XStreamPersister {
         // ServiceInfo
         xs.omitField( impl(ServiceInfo.class), "geoServer" );
 
+        xs.omitField(impl(SettingsInfo.class), "contact");
+
         // Converters
         xs.registerConverter(new SpaceInfoConverter());
         xs.registerConverter(new StoreInfoConverter());
@@ -393,6 +405,9 @@ public class XStreamPersister {
         xs.registerConverter(new ProxyCollectionConverter( xs.getMapper() ) );
         xs.registerConverter(new VirtualTableConverter());
         xs.registerConverter(new KeywordInfoConverter());
+        xs.registerConverter(new GeoServerInfoConverter());
+        xs.registerConverter(new SettingsInfoConverter());
+
 
         // register VirtulaTable handling
         registerBreifMapComplexType("virtualTable", VirtualTable.class);
@@ -1895,5 +1910,27 @@ public class XStreamPersister {
             writer.endNode();
         }
 
+    }
+    
+    class GeoServerInfoConverter extends AbstractReflectionConverter {
+        public GeoServerInfoConverter() {
+            super(GeoServerInfo.class);
+        }
+
+        @Override
+        protected void postDoMarshal(Object result, HierarchicalStreamWriter writer, MarshallingContext context) {
+            callback.postEncodeGeoServerInfo((GeoServerInfo)result, writer, context);
+        }
+    }
+
+    class SettingsInfoConverter extends AbstractReflectionConverter {
+        public SettingsInfoConverter() {
+            super(SettingsInfo.class);
+        }
+
+        @Override
+        protected void postDoMarshal(Object result, HierarchicalStreamWriter writer, MarshallingContext context) {
+            callback.postEncodeSettings((SettingsInfo)result, writer, context);
+        }
     }
 }

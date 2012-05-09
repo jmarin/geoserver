@@ -9,16 +9,22 @@ import org.geoserver.catalog.rest.AbstractCatalogResource;
 import org.geoserver.config.ContactInfo;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.GeoServerInfo;
+import org.geoserver.config.SettingsInfo;
 import org.geoserver.config.impl.SettingsInfoImpl;
+import org.geoserver.config.util.XStreamPersister;
 import org.geoserver.ows.util.OwsUtils;
+import org.geoserver.rest.format.DataFormat;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+
 /**
  * 
  * @author Juan Marin, OpenGeo
- *
+ * 
  */
 public class GlobalSettingsResource extends AbstractCatalogResource {
 
@@ -67,5 +73,17 @@ public class GlobalSettingsResource extends AbstractCatalogResource {
         GeoServerInfo geoServerInfo = geoServer.getGlobal();
         geoServerInfo.setSettings(settingsInfo);
         geoServer.save(geoServerInfo);
+    }
+
+    @Override
+    protected void configurePersister(XStreamPersister persister, DataFormat format) {
+        persister.setCallback(new XStreamPersister.Callback() {
+            protected void postEncodeGeoServerInfo(Object obj, HierarchicalStreamWriter writer,
+                    MarshallingContext context) {
+                writer.startNode("contactinfo");
+                encodeLink("/settings/contact", writer);
+                writer.endNode();
+            }
+        });
     }
 }
