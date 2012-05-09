@@ -25,7 +25,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 /**
  * 
  * @author Juan Marin, OpenGeo
- *
+ * 
  */
 public class LocalSettingsResource extends AbstractCatalogResource {
 
@@ -39,9 +39,7 @@ public class LocalSettingsResource extends AbstractCatalogResource {
 
     @Override
     public boolean allowPost() {
-        String workspace = getAttribute("workspace");
-        WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
-        return geoServer.getSettings(ws) == null;
+        return allowNew();
     }
 
     @Override
@@ -52,6 +50,12 @@ public class LocalSettingsResource extends AbstractCatalogResource {
     @Override
     public boolean allowDelete() {
         return allowExisting();
+    }
+
+    private boolean allowNew() {
+        String workspace = getAttribute("workspace");
+        WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+        return geoServer.getSettings(ws) == null;
     }
 
     private boolean allowExisting() {
@@ -67,8 +71,7 @@ public class LocalSettingsResource extends AbstractCatalogResource {
     protected Object handleObjectGet() throws Exception {
         String workspace = getAttribute("workspace");
         if (workspace != null) {
-            Catalog catalog = geoServer.getCatalog();
-            WorkspaceInfo workspaceInfo = catalog.getWorkspaceByName(workspace);
+            WorkspaceInfo workspaceInfo = geoServer.getCatalog().getWorkspaceByName(workspace);
             SettingsInfo settingsInfo = geoServer.getSettings(workspaceInfo);
             if (settingsInfo == null) {
                 settingsInfo = new SettingsInfoImpl();
@@ -81,19 +84,16 @@ public class LocalSettingsResource extends AbstractCatalogResource {
     }
 
     @Override
-    protected String handleObjectPost(Object object) throws Exception {
+    protected String handleObjectPost(Object obj) throws Exception {
         String name = "";
         String workspace = getAttribute("workspace");
         if (workspace != null) {
             Catalog catalog = geoServer.getCatalog();
             WorkspaceInfo workspaceInfo = catalog.getWorkspaceByName(workspace);
-            SettingsInfo global = geoServer.getSettings();
-            SettingsInfo newSettings = geoServer.getFactory().create(SettingsInfo.class);
-            OwsUtils.copy(global, newSettings, SettingsInfo.class);
-            OwsUtils.copy((SettingsInfo) object, newSettings, SettingsInfo.class);
-            newSettings.setWorkspace(workspaceInfo);
-            geoServer.add(newSettings);
-            name = newSettings.getWorkspace().getName();
+            SettingsInfo settings = (SettingsInfo) obj;
+            settings.setWorkspace(workspaceInfo);
+            geoServer.add(settings);
+            name = settings.getWorkspace().getName();
         }
         return name;
     }
@@ -106,6 +106,7 @@ public class LocalSettingsResource extends AbstractCatalogResource {
             SettingsInfo settingsInfo = (SettingsInfo) object;
             SettingsInfo original = geoServer.getSettings(workspaceInfo);
             OwsUtils.copy(settingsInfo, original, SettingsInfo.class);
+            original.setWorkspace(workspaceInfo);
             geoServer.save(original);
         }
     }

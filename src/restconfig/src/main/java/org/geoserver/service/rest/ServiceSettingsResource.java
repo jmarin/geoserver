@@ -80,7 +80,6 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
     protected String handleObjectPost(Object object) throws Exception {
         String name = "";
         String workspace = getAttribute("workspace");
-        ServiceInfo original = null;
         if (workspace != null) {
             WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
             if (ws == null) {
@@ -93,7 +92,6 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
                         "Service information already exists, creation of a new object is not allowed",
                         Status.CLIENT_ERROR_FORBIDDEN);
             }
-            original = geoServer.getService(clazz);
             ServiceInfo serviceInfo = (ServiceInfo) object;
             serviceInfo.setWorkspace(ws);
             name = serviceInfo.getName();
