@@ -47,11 +47,14 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
 
     @Override
     public boolean allowDelete() {
-        return allowNew();
+        return allowExisting();
     }
 
     private boolean allowNew() {
-        return geoServer.getService(clazz) != null;
+        String workspace = getAttribute("workspace");
+        WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+        assert(ws != null);
+        return geoServer.getService(ws, clazz) == null;
     }
 
     private boolean allowExisting() {
@@ -78,9 +81,13 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
         String name = "";
         String workspace = getAttribute("workspace");
         ServiceInfo original = null;
-        ServiceInfoImpl newInfo = null;
         if (workspace != null) {
             WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            if (ws == null) {
+                throw new RestletException(
+                        "Workspace does not exist",
+                        Status.CLIENT_ERROR_BAD_REQUEST);
+            }
             if (geoServer.getService(ws, clazz) != null) {
                 throw new RestletException(
                         "Service information already exists, creation of a new object is not allowed",
@@ -88,16 +95,13 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
             }
             original = geoServer.getService(clazz);
             ServiceInfo serviceInfo = (ServiceInfo) object;
+            serviceInfo.setWorkspace(ws);
             name = serviceInfo.getName();
             if (name == null) {
                 throw new RestletException("Service name cannot be null",
                         Status.CLIENT_ERROR_BAD_REQUEST);
             }
-            newInfo = geoServer.getFactory().create(ServiceInfoImpl.class);
-            OwsUtils.copy(geoServer.getService(clazz), newInfo, clazz);
-            newInfo.setId(null);
-            OwsUtils.copy(object, newInfo, clazz);
-            geoServer.add(newInfo);
+            geoServer.add(serviceInfo);
         }
         return name;
     }

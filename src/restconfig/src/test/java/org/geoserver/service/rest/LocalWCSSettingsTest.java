@@ -10,6 +10,7 @@ import org.geoserver.config.GeoServer;
 import org.geoserver.ows.LocalWorkspace;
 import org.geoserver.platform.GeoServerExtensions;
 import org.geoserver.wcs.WCSInfo;
+import org.geoserver.wms.WMSInfo;
 import org.w3c.dom.Document;
 
 import com.mockrunner.mock.web.MockHttpServletResponse;
@@ -57,10 +58,11 @@ public class LocalWCSSettingsTest extends CatalogRESTTestSupport {
     }
 
     public void testPostAsJSON() throws Exception {
+        removeLocalWorkspace();
         String input = "{'wcsinfo': {'id' : 'wcs', 'name' : 'WCS', 'workspace': {'name': 'sf'},'enabled': 'true'}}";
-        MockHttpServletResponse response = putAsServletResponse("/rest/services/wcs/sf/settings/",
+        MockHttpServletResponse response = postAsServletResponse("/rest/services/wcs/sf/settings/",
                 input, "text/json");
-        assertEquals(200, response.getStatusCode());
+        assertEquals(201, response.getStatusCode());
         JSON json = getAsJSON("/rest/services/wcs/sf/settings.json");
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
@@ -73,12 +75,13 @@ public class LocalWCSSettingsTest extends CatalogRESTTestSupport {
     }
 
     public void testPostAsXML() throws Exception {
+        removeLocalWorkspace();
         String xml = "<wcsinfo>" + "<id>wcs</id>" + "<workspace>" + "<name>sf</name>"
                 + "</workspace>" + "<name>OGC:WCS</name>" + "<enabled>false</enabled>"
                 + "</wcsinfo>";
-        MockHttpServletResponse response = putAsServletResponse("/rest/services/wcs/sf/settings",
+        MockHttpServletResponse response = postAsServletResponse("/rest/services/wcs/sf/settings",
                 xml, "text/xml");
-        assertEquals(200, response.getStatusCode());
+        assertEquals(201, response.getStatusCode());
 
         Document dom = getAsDOM("/rest/services/wcs/sf/settings.xml");
         assertEquals("wcsinfo", dom.getDocumentElement().getLocalName());
@@ -117,4 +120,9 @@ public class LocalWCSSettingsTest extends CatalogRESTTestSupport {
         assertEquals("", jsonObject.get("null"));
     }
 
+    private void removeLocalWorkspace() {
+        WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName("sf");
+        WCSInfo wcsInfo = geoServer.getService(ws, WCSInfo.class);
+        geoServer.remove(wcsInfo);
+    }
 }

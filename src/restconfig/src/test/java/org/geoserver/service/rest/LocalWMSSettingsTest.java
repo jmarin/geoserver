@@ -60,35 +60,38 @@ public class LocalWMSSettingsTest extends CatalogRESTTestSupport {
     }
 
     public void testPostAsJSON() throws Exception {
-        String input = "{'wmsinfo': {'id' : 'wms', 'name' : 'WMS', 'workspace': {'name': 'sf'},'enabled': 'true'}}";
-        MockHttpServletResponse response = putAsServletResponse("/rest/services/wms/sf/settings/",
+        removeLocalWorkspace();
+        String input = "{'wmsinfo': {'id' : 'wms_sf', 'workspace':{'name':'sf'},'name' : 'WMS', 'enabled': 'true'}}";
+        MockHttpServletResponse response = postAsServletResponse("/rest/services/wms/sf/settings/",
                 input, "text/json");
-        assertEquals(200, response.getStatusCode());
+        assertEquals(201, response.getStatusCode());
         JSON json = getAsJSON("/rest/services/wms/sf/settings.json");
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
         JSONObject wmsinfo = (JSONObject) jsonObject.get("wmsinfo");
-        assertEquals("wms", wmsinfo.get("id"));
+        assertEquals("wms_sf", wmsinfo.get("id")); 
         assertEquals("WMS", wmsinfo.get("name"));
+        assertEquals("true", wmsinfo.get("enabled").toString().trim());
         JSONObject workspace = (JSONObject) wmsinfo.get("workspace");
         assertNotNull(workspace);
         assertEquals("sf", workspace.get("name"));
     }
 
     public void testPostAsXML() throws Exception {
-        String xml = "<wmsinfo>" + "<id>wms</id>" + "<workspace>" + "<name>sf</name>"
+        removeLocalWorkspace();
+        String xml = "<wmsinfo>" + "<id>wms_sf</id>" + "<workspace>" + "<name>sf</name>"
                 + "</workspace>" + "<name>OGC:WMS</name>" + "<enabled>false</enabled>"
                 + "<interpolation>Nearest</interpolation>" + "</wmsinfo>";
-        MockHttpServletResponse response = putAsServletResponse("/rest/services/wms/sf/settings",
+        MockHttpServletResponse response = postAsServletResponse("/rest/services/wms/sf/settings",
                 xml, "text/xml");
-        assertEquals(200, response.getStatusCode());
+        assertEquals(201, response.getStatusCode());
 
         Document dom = getAsDOM("/rest/services/wms/sf/settings.xml");
         assertEquals("wmsinfo", dom.getDocumentElement().getLocalName());
         assertXpathEvaluatesTo("false", "/wmsinfo/enabled", dom);
         assertXpathEvaluatesTo("sf", "/wmsinfo/workspace/name", dom);
         assertXpathEvaluatesTo("OGC:WMS", "/wmsinfo/name", dom);
-        assertXpathEvaluatesTo("false", "/wmsinfo/watermark/enabled", dom);
+        assertXpathEvaluatesTo("false", "/wmsinfo/enabled", dom);
         assertXpathEvaluatesTo("Nearest", "/wmsinfo/interpolation", dom);
     }
 
@@ -122,4 +125,9 @@ public class LocalWMSSettingsTest extends CatalogRESTTestSupport {
         assertEquals("", jsonObject.get("null"));
     }
 
+    private void removeLocalWorkspace() {
+        WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName("sf");
+        WMSInfo wmsInfo = geoServer.getService(ws, WMSInfo.class);
+        geoServer.remove(wmsInfo);
+    }
 }
