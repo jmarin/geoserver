@@ -63,7 +63,7 @@ public class GlobalSettingsResource extends AbstractCatalogResource {
         OwsUtils.copy(geoServerInfo, original, GeoServerInfo.class);
         original.getSettings().setContact(contactInfo);
         geoServer.save(original);
-    }
+    }   
 
     @Override
     public void handleObjectDelete() throws Exception {
