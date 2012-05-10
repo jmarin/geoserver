@@ -9,7 +9,6 @@ import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.catalog.rest.AbstractCatalogResource;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.ServiceInfo;
-import org.geoserver.config.impl.ServiceInfoImpl;
 import org.geoserver.ows.util.OwsUtils;
 import org.geoserver.rest.RestletException;
 import org.restlet.Context;
@@ -20,11 +19,11 @@ import org.restlet.data.Status;
 /**
  * 
  * @author Juan Marin, OpenGeo
- *
+ * 
  */
 public class ServiceSettingsResource extends AbstractCatalogResource {
 
-    private GeoServer geoServer;
+    protected GeoServer geoServer;
 
     private Class clazz;
 
@@ -53,7 +52,7 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
     private boolean allowNew() {
         String workspace = getAttribute("workspace");
         WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
-        assert(ws != null);
+        assert (ws != null);
         return geoServer.getService(ws, clazz) == null;
     }
 
@@ -71,7 +70,15 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
         String workspace = getAttribute("workspace");
         if (workspace != null) {
             WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            if (geoServer.getService(ws, clazz) == null) {
+                throw new RestletException("Service for workspace " + workspace + " does not exist",
+                        Status.CLIENT_ERROR_NOT_FOUND);
+            }
             return geoServer.getService(ws, clazz);
+        }
+        if (geoServer.getService(clazz) == null) {
+            throw new RestletException("Service for workspace " + workspace + " does not exist",
+                    Status.CLIENT_ERROR_NOT_FOUND);
         }
         return (ServiceInfo) geoServer.getService(clazz);
     }
@@ -79,12 +86,22 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
     @Override
     protected String handleObjectPost(Object object) throws Exception {
         String name = "";
+        ServiceInfo serviceInfo = handlePost(object);
+        name = serviceInfo.getName();
+        if (name == null) {
+            throw new RestletException("Service name cannot be null",
+                    Status.CLIENT_ERROR_BAD_REQUEST);
+        }
+        geoServer.add(serviceInfo);
+        return name;
+    }
+
+    protected ServiceInfo handlePost(Object object) {
         String workspace = getAttribute("workspace");
         if (workspace != null) {
             WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
             if (ws == null) {
-                throw new RestletException(
-                        "Workspace does not exist",
+                throw new RestletException("Workspace does not exist",
                         Status.CLIENT_ERROR_BAD_REQUEST);
             }
             if (geoServer.getService(ws, clazz) != null) {
@@ -94,14 +111,9 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
             }
             ServiceInfo serviceInfo = (ServiceInfo) object;
             serviceInfo.setWorkspace(ws);
-            name = serviceInfo.getName();
-            if (name == null) {
-                throw new RestletException("Service name cannot be null",
-                        Status.CLIENT_ERROR_BAD_REQUEST);
-            }
-            geoServer.add(serviceInfo);
+            return serviceInfo;
         }
-        return name;
+        return null;
     }
 
     @Override
@@ -131,5 +143,4 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
             }
         }
     }
-
 }
