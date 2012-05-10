@@ -2,6 +2,7 @@ package org.geoserver.service.rest;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
 import net.sf.json.JSON;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import org.geoserver.catalog.WorkspaceInfo;
@@ -117,9 +118,13 @@ public class LocalWFSSettingsTest extends CatalogRESTTestSupport {
 
     public void testDelete() throws Exception {
         assertEquals(200, deleteAsServletResponse("/rest/services/wfs/sf/settings").getStatusCode());
-        JSON json = getAsJSON("/rest/services/wfs/sf/settings.json");
-        JSONObject jsonObject = (JSONObject) json;
-        assertEquals("", jsonObject.get("null"));
+        boolean thrown = false;
+        try {
+            JSON json = getAsJSON("/rest/services/wfs/sf/settings.json");
+        } catch (JSONException e) {
+            thrown = true;
+        }
+        assertEquals(true, thrown);
     }
 
     private void removeLocalWorkspace() {
