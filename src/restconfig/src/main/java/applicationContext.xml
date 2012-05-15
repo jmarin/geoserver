@@ -318,14 +318,6 @@
         </entry>
 
         <entry>
-            <key><value>/settings/contact</value></key>
-            <value>globalContactFinder</value>
-        </entry>
-        <entry>
-            <key><value>/settings/contact.{format}</value></key>
-            <value>globalContactFinder</value>
-        </entry>
-        <entry>
             <key><value>/settings.{format}</value></key>
             <value>globalSettingsFinder</value>
         </entry>
@@ -438,7 +430,6 @@
     <constructor-arg ref="geoServer"></constructor-arg>
   </bean>
   
-  <bean id="globalContactFinder" class="org.geoserver.rest.GlobalContactFinder" parent="abstractGeoServerFinder"/>
   <bean id="globalSettingsFinder" class="org.geoserver.rest.GlobalSettingsFinder" parent="abstractGeoServerFinder"/>
   <bean id="localSettingsFinder" class="org.geoserver.rest.LocalSettingsFinder" parent="abstractGeoServerFinder"/>
   <bean id="wmsSettingsFinder" class="org.geoserver.service.rest.WMSSettingsFinder" parent="abstractGeoServerFinder"/>
