@@ -41,10 +41,6 @@ public class GlobalSettingsResource extends AbstractCatalogResource {
         return allowExisting();
     }
 
-    @Override
-    public boolean allowDelete() {
-        return allowExisting();
-    }
 
     private boolean allowExisting() {
         return geoServer.getGlobal().getSettings() != null;
@@ -65,25 +61,5 @@ public class GlobalSettingsResource extends AbstractCatalogResource {
         geoServer.save(original);
     }   
 
-    @Override
-    public void handleObjectDelete() throws Exception {
-        ContactInfo contactInfo = geoServer.getSettings().getContact();
-        SettingsInfoImpl settingsInfo = new SettingsInfoImpl();
-        settingsInfo.setContact(contactInfo);
-        GeoServerInfo geoServerInfo = geoServer.getGlobal();
-        geoServerInfo.setSettings(settingsInfo);
-        geoServer.save(geoServerInfo);
-    }
 
-    @Override
-    protected void configurePersister(XStreamPersister persister, DataFormat format) {
-        persister.setCallback(new XStreamPersister.Callback() {
-            protected void postEncodeGeoServerInfo(Object obj, HierarchicalStreamWriter writer,
-                    MarshallingContext context) {
-                writer.startNode("contactinfo");
-                encodeLink("/settings/contact", writer);
-                writer.endNode();
-            }
-        });
-    }
 }

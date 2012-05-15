@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.media.jai.TileCache;
+
 import org.apache.commons.collections.MultiHashMap;
 import org.geoserver.catalog.AttributeTypeInfo;
 import org.geoserver.catalog.AttributionInfo;
@@ -178,10 +180,6 @@ public class XStreamPersister {
 
         protected void postEncodeWMSStore(WMSStoreInfo store, HierarchicalStreamWriter writer,  MarshallingContext context) {
             
-        }
-
-        protected void postEncodeGeoServerInfo (Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
-
         }
 
         protected void postEncodeSettings (Object obj, HierarchicalStreamWriter writer, MarshallingContext context) {
@@ -1918,8 +1916,142 @@ public class XStreamPersister {
         }
 
         @Override
-        protected void postDoMarshal(Object result, HierarchicalStreamWriter writer, MarshallingContext context) {
-            callback.postEncodeGeoServerInfo((GeoServerInfo)result, writer, context);
+        protected void doMarshal(Object source,
+                HierarchicalStreamWriter writer, MarshallingContext context) {
+            GeoServerInfo geoServerInfo = (GeoServerInfo) source;
+            SettingsInfo settingsInfo = geoServerInfo.getSettings();
+            ContactInfo contactInfo = settingsInfo.getContact();
+            CoverageAccessInfo coverageAccessInfo = geoServerInfo.getCoverageAccess();
+            if (contactInfo != null) {
+                writer.startNode("contact");
+                if (contactInfo.getAddress() != null) {
+                    writer.startNode("address");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getAddress());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressCity() != null) {
+                    writer.startNode("addressCity");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getAddressCity());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressCountry() != null) {
+                    writer.startNode("addressCountry");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getAddressCountry());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressPostalCode() != null) {
+                    writer.startNode("addressPostalCode");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getAddressPostalCode());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressState() != null) {
+                    writer.startNode("addressState");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getAddressState());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressType() != null) {
+                    writer.startNode("addressType");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getAddressType());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactEmail() != null) {
+                    writer.startNode("contactEmail");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getContactEmail());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactFacsimile()!= null) {
+                    writer.startNode("contactFacsimile");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getContactFacsimile());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactOrganization() != null) {
+                    writer.startNode("contactOrganization");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getContactOrganization());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactPerson() != null) {
+                    writer.startNode("contactPerson");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getContactPerson());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactPosition()!= null) {
+                    writer.startNode("contactPosition");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getContactPosition());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactVoice()!= null) {
+                    writer.startNode("contactVoice");
+                    writer.setValue(geoServerInfo.getSettings().getContact().getContactVoice());
+                    writer.endNode();
+                }
+                writer.endNode();
+            }
+            JAIInfo jai = geoServerInfo.getJAI();
+            if (jai != null) {
+                writer.startNode("jai");
+                writer.startNode("allowInterpolation");
+                writer.setValue(new Boolean(jai.getAllowInterpolation()).toString());
+                writer.endNode();
+                writer.startNode("tilePriority");
+                writer.setValue(new Integer(jai.getTilePriority()).toString());
+                writer.endNode();
+                writer.startNode("tileThreads");
+                writer.setValue(new Integer(jai.getTileThreads()).toString());
+                writer.endNode();
+                writer.startNode("memoryCapacity");
+                writer.setValue(new Double(jai.getMemoryCapacity()).toString());
+                writer.endNode();
+                writer.startNode("memoryThreshold");
+                writer.setValue(new Double(jai.getMemoryThreshold()).toString());
+                writer.endNode();
+                writer.endNode();
+            }
+            if (coverageAccessInfo != null) {
+                writer.startNode("coverageAccess");
+                writer.startNode("maxPoolSize");
+                writer.setValue(new Integer(coverageAccessInfo.getMaxPoolSize()).toString());
+                writer.endNode();
+                writer.startNode("corePoolSize");
+                writer.setValue(new Integer(coverageAccessInfo.getCorePoolSize()).toString());
+                writer.endNode();
+                writer.startNode("keepAliveTime");
+                writer.setValue(new Integer(coverageAccessInfo.getKeepAliveTime()).toString());
+                writer.endNode();
+                writer.startNode("queueType");
+                writer.setValue(coverageAccessInfo.getQueueType().name());
+                writer.endNode();
+                writer.startNode("imageIOCacheThreshold");
+                writer.setValue(new Long(coverageAccessInfo.getImageIOCacheThreshold()).toString());
+                writer.endNode();
+                writer.endNode();
+            }
+            writer.startNode("charset");
+            writer.setValue(settingsInfo.getCharset());
+            writer.endNode();
+            writer.startNode("numDecimals");
+            writer.setValue(new Integer(settingsInfo.getNumDecimals()).toString());
+            writer.endNode();
+            writer.startNode("onlineResource");
+            writer.setValue(settingsInfo.getOnlineResource());
+            writer.endNode();
+            writer.startNode("verbose");
+            writer.setValue(new Boolean(settingsInfo.isVerbose()).toString());
+            writer.endNode();
+            writer.startNode("verboseExceptions");
+            writer.setValue(new Boolean(settingsInfo.isVerboseExceptions()).toString());
+            writer.endNode();
+            writer.startNode("updateSequence");
+            writer.setValue(new Long(geoServerInfo.getUpdateSequence()).toString());
+            writer.endNode();
+            writer.startNode("featureTypeCacheSize");
+            writer.setValue(new Integer(geoServerInfo.getFeatureTypeCacheSize()).toString());
+            writer.endNode();
+            writer.startNode("globalServices");
+            writer.setValue(new Boolean(geoServerInfo.isGlobalServices()).toString());
+            writer.endNode();
+            writer.startNode("xmlPostRequestLogBufferSize");
+            writer.setValue(new Integer(geoServerInfo.getXmlPostRequestLogBufferSize()).toString());
+            writer.endNode();
         }
     }
 
