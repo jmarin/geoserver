@@ -2061,8 +2061,105 @@ public class XStreamPersister {
         }
 
         @Override
-        protected void postDoMarshal(Object result, HierarchicalStreamWriter writer, MarshallingContext context) {
-            callback.postEncodeSettings((SettingsInfo)result, writer, context);
+        protected void doMarshal(Object source,
+                HierarchicalStreamWriter writer, MarshallingContext context) {
+            SettingsInfo settingsInfo = (SettingsInfo) source;
+            WorkspaceInfo workspaceInfo = settingsInfo.getWorkspace();
+            ContactInfo contactInfo = settingsInfo.getContact();
+            if (workspaceInfo != null) {
+                writer.startNode("workspace");
+                writer.startNode("name");
+                writer.setValue(workspaceInfo.getName());
+                writer.endNode();
+                writer.endNode();
+            }
+            if (contactInfo != null) {
+                writer.startNode("contact");
+                if (contactInfo.getAddress() != null) {
+                    writer.startNode("address");
+                    writer.setValue(contactInfo.getAddress());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressCity() != null) {
+                    writer.startNode("addressCity");
+                    writer.setValue(contactInfo.getAddressCity());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressCountry() != null) {
+                    writer.startNode("addressCountry");
+                    writer.setValue(contactInfo.getAddressCountry());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressPostalCode() != null) {
+                    writer.startNode("addressPostalCode");
+                    writer.setValue(contactInfo.getAddressPostalCode());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressState() != null) {
+                    writer.startNode("addressState");
+                    writer.setValue(contactInfo.getAddressState());
+                    writer.endNode();
+                }
+                if (contactInfo.getAddressType() != null) {
+                    writer.startNode("addressType");
+                    writer.setValue(contactInfo.getAddressType());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactEmail() != null) {
+                    writer.startNode("contactEmail");
+                    writer.setValue(contactInfo.getContactEmail());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactFacsimile()!= null) {
+                    writer.startNode("contactFacsimile");
+                    writer.setValue(contactInfo.getContactFacsimile());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactOrganization() != null) {
+                    writer.startNode("contactOrganization");
+                    writer.setValue(contactInfo.getContactOrganization());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactPerson() != null) {
+                    writer.startNode("contactPerson");
+                    writer.setValue(contactInfo.getContactPerson());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactPosition()!= null) {
+                    writer.startNode("contactPosition");
+                    writer.setValue(contactInfo.getContactPosition());
+                    writer.endNode();
+                }
+                if (contactInfo.getContactVoice()!= null) {
+                    writer.startNode("contactVoice");
+                    writer.setValue(contactInfo.getContactVoice());
+                    writer.endNode();
+                }
+                writer.endNode();
+            }
+            writer.startNode("charset");
+            writer.setValue(settingsInfo.getCharset());
+            writer.endNode();
+            writer.startNode("numDecimals");
+            writer.setValue(new Integer(settingsInfo.getNumDecimals()).toString());
+            writer.endNode();
+            if (settingsInfo.getOnlineResource()!= null) {
+                writer.startNode("onlineResource");
+                writer.setValue(settingsInfo.getOnlineResource());
+                writer.endNode();
+            }
+            if (settingsInfo.getProxyBaseUrl()!= null) {
+                writer.startNode("proxyBaseUrl");
+                writer.setValue(settingsInfo.getProxyBaseUrl());
+                writer.endNode();
+            }
+            writer.startNode("verbose");
+            writer.setValue(new Boolean(settingsInfo.isVerbose()).toString());
+            writer.endNode();
+            writer.startNode("verboseExceptions");
+            writer.setValue(new Boolean(settingsInfo.isVerboseExceptions()).toString());
+            writer.endNode();
         }
+
     }
 }

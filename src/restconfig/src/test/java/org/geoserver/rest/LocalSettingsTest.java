@@ -52,6 +52,10 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
         assertEquals("8", settings.get("numDecimals").toString().trim());
         assertEquals("false", settings.get("verbose").toString().trim());
         assertEquals("false", settings.get("verboseExceptions").toString().trim());
+        JSONObject contact = settings.getJSONObject("contact");
+        assertNotNull(contact);
+        assertEquals("Andrea Aime", contact.get("contactPerson"));
+
     }
 
     public void testGetAsXML() throws Exception {
@@ -62,12 +66,17 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
         assertXpathEvaluatesTo("8", "/settings/numDecimals", dom);
         assertXpathEvaluatesTo("false", "/settings/verbose", dom);
         assertXpathEvaluatesTo("false", "/settings/verboseExceptions", dom);
+        assertXpathEvaluatesTo("Andrea Aime", "/settings/contact/contactPerson", dom);
     }
 
     public void testPostAsJSON() throws Exception {
         geoServer.remove(geoServer.getSettings(geoServer.getCatalog().getWorkspaceByName("sf")));
-        String json = "{'settings': " + "{'workspace':" + " {'name': 'sf'},"
-                + "'numDecimals': '8','onlineResource':'http://geoserver.org'}}}";
+        String json = "{'settings':{'workspace':{'name':'sf'},"
+                + "'contact':{'addressCity':'Alexandria','addressCountry':'Egypt','addressType':'Work',"
+                + "'contactEmail':'claudius.ptolomaeus@gmail.com','contactOrganization':'The ancient geographes INC',"
+                + "'contactPerson':'Claudius Ptolomaeus','contactPosition':'Chief geographer'},"
+                + "'charset':'UTF-8','numDecimals':10,'onlineResource':'http://geoserver.org',"
+                + "'proxyBaseUrl':'http://proxy.url','verbose':false,'verboseExceptions':'true'}}";
         MockHttpServletResponse response = postAsServletResponse("/rest/workspaces/sf/settings",
                 json, "text/json");
         assertEquals(201, response.getStatusCode());
@@ -79,16 +88,29 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
         JSONObject workspace = settings.getJSONObject("workspace");
         assertNotNull(workspace);
         assertEquals("sf", workspace.get("name"));
-        assertEquals("8", settings.get("numDecimals").toString().trim());
+        assertEquals("10", settings.get("numDecimals").toString().trim());
         assertEquals("http://geoserver.org", settings.get("onlineResource"));
+        assertEquals("http://proxy.url", settings.get("proxyBaseUrl"));
+        JSONObject contact = settings.getJSONObject("contact");
+        assertEquals("Claudius Ptolomaeus", contact.get("contactPerson"));
+        assertEquals("The ancient geographes INC", contact.get("contactOrganization"));
+        assertEquals("Work", contact.get("addressType"));
+        assertEquals("claudius.ptolomaeus@gmail.com", contact.get("contactEmail"));
 
     }
 
     public void testPostAsXML() throws Exception {
         geoServer.remove(geoServer.getSettings(geoServer.getCatalog().getWorkspaceByName("sf")));
-        String xml = "<settings>" + "<workspace><name>sf</name></workspace>"
+        String xml = "<settings>" + "<workspace><name>sf</name></workspace>" + "<contact>"
+                + "<addressCity>Alexandria</addressCity>"
+                + "<addressCountry>Egypt</addressCountry>" + "<addressType>Work</addressType>"
+                + "<contactEmail>claudius.ptolomaeus@gmail.com</contactEmail>"
+                + "<contactOrganization>The ancient geographes INC</contactOrganization>"
+                + "<contactPerson>Claudius Ptolomaeus</contactPerson>"
+                + "<contactPosition>Chief geographer</contactPosition>" + "</contact>"
                 + "<charset>UTF-8</charset>" + "<numDecimals>8</numDecimals>"
                 + "<onlineResource>http://geoserver.org</onlineResource>"
+                + "<proxyBaseUrl>http://proxy.url</proxyBaseUrl>"
                 + "<verbose>false</verbose>" + "<verboseExceptions>false</verboseExceptions>"
                 + "</settings>";
         MockHttpServletResponse response = postAsServletResponse("/rest/workspaces/sf/settings",
@@ -100,11 +122,23 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
         assertXpathEvaluatesTo("sf", "/settings/workspace/name", dom);
         assertXpathEvaluatesTo("false", "/settings/verbose", dom);
         assertXpathEvaluatesTo("false", "/settings/verboseExceptions", dom);
+        assertXpathEvaluatesTo("http://geoserver.org","/settings/onlineResource",dom);
+        assertXpathEvaluatesTo("http://proxy.url","/settings/proxyBaseUrl",dom);
+        assertXpathEvaluatesTo("Claudius Ptolomaeus","/settings/contact/contactPerson",dom);
+        assertXpathEvaluatesTo("claudius.ptolomaeus@gmail.com","/settings/contact/contactEmail",dom);
+        assertXpathEvaluatesTo("Chief geographer","/settings/contact/contactPosition",dom);
+        assertXpathEvaluatesTo("The ancient geographes INC","/settings/contact/contactOrganization",dom);
+        assertXpathEvaluatesTo("Egypt","/settings/contact/addressCountry",dom);
+        
     }
 
     public void testPutAsJSON() throws Exception {
-        String inputJson = "{'settings': " + "{'workspace':" + " {'name': 'sf'},"
-                + "'numDecimals': '10','onlineResource':'http://geoserver2.org'}}}";
+        String inputJson = "{'settings':{'workspace':{'name':'sf'},"
+                + "'contact':{'addressCity':'Cairo','addressCountry':'Egypt','addressType':'Work',"
+                + "'contactEmail':'claudius.ptolomaeus@gmail.com','contactOrganization':'The ancient geographes INC',"
+                + "'contactPerson':'Claudius Ptolomaeus','contactPosition':'Chief geographer'},"
+                + "'charset':'UTF-8','numDecimals':8,'onlineResource':'http://geoserver2.org',"
+                + "'proxyBaseUrl':'http://proxy2.url','verbose':true,'verboseExceptions':'true'}}";
 
         MockHttpServletResponse response = putAsServletResponse("/rest/workspaces/sf/settings",
                 inputJson, "text/json");
@@ -117,31 +151,45 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
         JSONObject workspace = settings.getJSONObject("workspace");
         assertNotNull(workspace);
         assertEquals("sf", workspace.get("name"));
-        assertEquals("10", settings.get("numDecimals").toString().trim());
+        assertEquals("8", settings.get("numDecimals").toString().trim());
         assertEquals("http://geoserver2.org", settings.get("onlineResource"));
-
+        assertEquals("http://proxy2.url", settings.get("proxyBaseUrl"));
+        assertEquals("true", settings.get("verbose").toString().trim());
+        assertEquals("true", settings.get("verboseExceptions").toString().trim());
+        JSONObject contact = settings.getJSONObject("contact");
+        assertNotNull(contact);
+        assertEquals("Claudius Ptolomaeus", contact.get("contactPerson"));
+        assertEquals("Cairo", contact.get("addressCity"));
     }
 
     public void testPutAsXML() throws Exception {
-        String xml = "<settings>" + "<workspace><name>sf</name></workspace>"
+        String xml =  "<settings>" + "<workspace><name>sf</name></workspace>" + "<contact>"
+                + "<addressCity>Cairo</addressCity>"
+                + "<addressCountry>Egypt</addressCountry>" + "<addressType>Work</addressType>"
+                + "<contactEmail>claudius.ptolomaeus@gmail.com</contactEmail>"
+                + "<contactOrganization>The ancient geographes INC</contactOrganization>"
+                + "<contactPerson>Claudius Ptolomaeus</contactPerson>"
+                + "<contactPosition>Chief geographer</contactPosition>" + "</contact>"
                 + "<charset>UTF-8</charset>" + "<numDecimals>10</numDecimals>"
-                + "<onlineResource>http://geoserver.org</onlineResource>"
+                + "<onlineResource>http://geoserver2.org</onlineResource>"
+                + "<proxyBaseUrl>http://proxy2.url</proxyBaseUrl>"
                 + "<verbose>true</verbose>" + "<verboseExceptions>true</verboseExceptions>"
                 + "</settings>";
         MockHttpServletResponse response = putAsServletResponse("/rest/workspaces/sf/settings",
                 xml, "text/xml");
         assertEquals(200, response.getStatusCode());
-        JSON json = getAsJSON("/rest/workspaces/sf/settings.json");
-        JSONObject jsonObject = (JSONObject) json;
-        assertNotNull(jsonObject);
-        JSONObject settings = jsonObject.getJSONObject("settings");
-        assertNotNull(settings);
-        JSONObject workspace = settings.getJSONObject("workspace");
-        assertNotNull(workspace);
-        assertEquals("sf", workspace.get("name"));
-        assertEquals("true", settings.get("verbose").toString().trim());
-        assertEquals("true", settings.get("verboseExceptions").toString().trim());
-        assertEquals("10", settings.get("numDecimals").toString().trim());
+        Document dom = getAsDOM("/rest/workspaces/sf/settings.xml");
+        assertEquals("settings", dom.getDocumentElement().getLocalName());
+        assertXpathEvaluatesTo("sf", "/settings/workspace/name", dom);
+        assertXpathEvaluatesTo("true", "/settings/verbose", dom);
+        assertXpathEvaluatesTo("true", "/settings/verboseExceptions", dom);
+        assertXpathEvaluatesTo("http://geoserver2.org","/settings/onlineResource",dom);
+        assertXpathEvaluatesTo("http://proxy2.url","/settings/proxyBaseUrl",dom);
+        assertXpathEvaluatesTo("Claudius Ptolomaeus","/settings/contact/contactPerson",dom);
+        assertXpathEvaluatesTo("claudius.ptolomaeus@gmail.com","/settings/contact/contactEmail",dom);
+        assertXpathEvaluatesTo("Chief geographer","/settings/contact/contactPosition",dom);
+        assertXpathEvaluatesTo("The ancient geographes INC","/settings/contact/contactOrganization",dom);
+        assertXpathEvaluatesTo("Cairo","/settings/contact/addressCity",dom);
     }
 
     public void testDelete() throws Exception {

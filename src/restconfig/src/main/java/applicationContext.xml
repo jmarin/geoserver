@@ -325,14 +325,14 @@
             <key><value>/settings</value></key>
             <value>globalSettingsFinder</value>
         </entry>
-        <!-- <entry>
+        <entry>
             <key><value>/workspaces/{workspace}/settings</value></key>
             <value>localSettingsFinder</value>
         </entry>
         <entry>
             <key><value>/workspaces/{workspace}/settings.{format}</value></key>
             <value>localSettingsFinder</value>
-        </entry> -->
+        </entry>
 
         <entry>
             <key><value>/services/wms/settings</value></key>

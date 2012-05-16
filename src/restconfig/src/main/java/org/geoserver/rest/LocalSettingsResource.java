@@ -93,6 +93,7 @@ public class LocalSettingsResource extends AbstractCatalogResource {
             SettingsInfo settings = (SettingsInfo) obj;
             settings.setWorkspace(workspaceInfo);
             geoServer.add(settings);
+            geoServer.save(geoServer.getSettings(workspaceInfo));
             name = settings.getWorkspace().getName();
         }
         return name;
@@ -119,28 +120,6 @@ public class LocalSettingsResource extends AbstractCatalogResource {
             SettingsInfo settingsInfo = geoServer.getSettings(workspaceInfo);
             geoServer.remove(settingsInfo);
         }
-    }
-
-    @Override
-    protected void configurePersister(XStreamPersister persister, DataFormat format) {
-        persister.setCallback(new XStreamPersister.Callback() {
-            protected void postEncodeSettings(Object obj, HierarchicalStreamWriter writer,
-                    MarshallingContext context) {
-                String workspaceName = getAttribute("workspace");
-                writer.startNode("wcsinfo");
-                encodeLink("/services/wcs/" + workspaceName + "/settings", writer);
-                writer.endNode();
-                writer.startNode("wfsinfo");
-                encodeLink("/services/wfs/" + workspaceName + "/settings", writer);
-                writer.endNode();
-                writer.startNode("wmsinfo");
-                encodeLink("/services/wms/" + workspaceName + "/settings", writer);
-                writer.endNode();
-                writer.startNode("contactinfo");
-                encodeLink("/workspaces/" + workspaceName + "/settings/contact", writer);
-                writer.endNode();
-            }
-        });
     }
 
 }
