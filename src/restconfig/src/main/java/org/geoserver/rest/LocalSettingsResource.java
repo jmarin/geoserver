@@ -11,16 +11,11 @@ import org.geoserver.catalog.rest.AbstractCatalogResource;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.SettingsInfo;
 import org.geoserver.config.impl.SettingsInfoImpl;
-import org.geoserver.config.util.XStreamPersister;
 import org.geoserver.ows.util.OwsUtils;
-import org.geoserver.rest.format.DataFormat;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-
-import com.thoughtworks.xstream.converters.MarshallingContext;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 /**
  * 

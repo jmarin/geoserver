@@ -11,7 +11,6 @@ import org.geoserver.config.GeoServer;
 import org.geoserver.ows.LocalWorkspace;
 import org.geoserver.platform.GeoServerExtensions;
 import org.geoserver.wcs.WCSInfo;
-import org.geoserver.wms.WMSInfo;
 import org.w3c.dom.Document;
 
 import com.mockrunner.mock.web.MockHttpServletResponse;
