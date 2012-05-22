@@ -53,21 +53,24 @@ them::
 Building offline
 ----------------
 
-Maven operates by automatically downloading any dependencies declared by a 
-module being built. When dealing with SNAPSHOT dependencies this can be 
-problematic. Each time Maven performs its first build of the day it tries to 
-update any SNAPSHOT dependencies it occurs.  
+Maven automatically downloads dependencies declared by 
+modules being built. In the case of SNAPSHOT dependencies,
+Maven downloads updates each time it performs the first build of the day.
 
-This can be a problem as GeoServer depends on SNAPSHOT versions of the GeoTools
-library. The end result is maven downloading a lot of updates GeoTools modules
-and an increased built time. Which if you built geotools locally, is unecessary.
+GeoServer depends on SNAPSHOT versions of the GeoTools library.  
+The automatic download can result in lengthy build time
+while Maven downloads updated GeoTools modules. 
+If GeoTools was built locally, these downloads are unecessary.
+
+Also, if GeoTools is being modified locally, then the local versions 
+rather than SNAPSHOT versions of modules should be used.
 
 This can be remedied by running maven in "offline mode"::
 
   mvn -o clean install
 
-In offline mode Maven will not attempt to download any external dependencies, 
-and will not attempt to update any SNAPSHOT dependencies.
+In offline mode Maven will not download external dependencies, 
+and will not update SNAPSHOT dependencies.
 
 Building extensions
 -------------------
@@ -215,7 +218,7 @@ specify a different data directory the ``GEOSERVER_DATA_DIR`` flag is used::
 Installing the Oracle module
 ----------------------------
 
-To configure GeoServer to provide the Oracle datastore option, do the following:
+To configure GeoServer to include the Oracle datastore extension module, do the following:
 
 Obtain the appropriate Oracle JDBC driver (possibly by downloading from Oracle).
 Install it in the Maven repository using the command::
@@ -225,8 +228,13 @@ Install it in the Maven repository using the command::
 Configure the Eclipse project using::
 
   mvn -o -P oracle,oracleDriver eclipse:eclipse
-  
-In Eclipse, import the ``oracle`` module project. 
+
+(The ``oracle`` profile includes the GeoServer Oracle module, 
+while the ``oracleDriver`` profile includes the proprietary Oracle JDBC driver.
+These are separate because there are situations where 
+the Oracle JDBC JAR should not be included with the build.)
+
+Finally, in Eclipse import the ``oracle`` module project. 
 Refresh the ``web-app`` project to configure the dependency on the ``oracle`` project.
 
 When GeoServer is run, Oracle should be provided as a **Vector Data Source** on the *New Data source* page
