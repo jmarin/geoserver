@@ -48,9 +48,9 @@ public abstract class CatalogResourceBase extends ReflectiveResource {
      * the catalog
      */
     protected Catalog catalog;
-    
+
     protected GeoServer geoServer;
-    
+
     /**
      * the class of the resource
      */

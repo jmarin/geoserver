@@ -128,7 +128,6 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
         assertXpathEvaluatesTo("Chief geographer","/settings/contact/contactPosition",dom);
         assertXpathEvaluatesTo("The ancient geographes INC","/settings/contact/contactOrganization",dom);
         assertXpathEvaluatesTo("Egypt","/settings/contact/addressCountry",dom);
-        
     }
 
     public void testPutAsJSON() throws Exception {

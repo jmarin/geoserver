@@ -70,7 +70,7 @@ public class LocalWMSSettingsTest extends CatalogRESTTestSupport {
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
         JSONObject wmsinfo = (JSONObject) jsonObject.get("wmsinfo");
-        assertEquals("wms_sf", wmsinfo.get("id")); 
+        assertEquals("wms_sf", wmsinfo.get("id"));
         assertEquals("WMS", wmsinfo.get("name"));
         assertEquals("true", wmsinfo.get("enabled").toString().trim());
         JSONObject workspace = (JSONObject) wmsinfo.get("workspace");

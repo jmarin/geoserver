@@ -90,7 +90,7 @@ public class GlobalSettingsTest extends CatalogRESTTestSupport {
         assertEquals("UTF-8", settings.get("charset"));
         assertEquals("10", settings.get("numDecimals").toString().trim());
         assertEquals("http://geoserver2.org", settings.get("onlineResource"));
-        
+
         JSONObject contact = settings.getJSONObject("contact");
         assertNotNull(contact);
         assertEquals("Claudius Ptolomaeus", contact.get("contactPerson"));
