@@ -47,11 +47,6 @@ public class WFSSettingsResource extends ServiceSettingsResource {
     }
 
     @Override
-    public boolean allowDelete() {
-        return false;
-    }
-
-    @Override
     protected void configurePersister(XStreamPersister persister, DataFormat format) {
         persister.setHideFeatureTypeAttributes();
         persister.getXStream().alias("wfsinfo", WFSInfoImpl.class);

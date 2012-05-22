@@ -15,6 +15,7 @@ import org.geoserver.config.util.XStreamPersister;
 import org.geoserver.rest.format.DataFormat;
 import org.geoserver.wcs.WCSInfo;
 import org.geoserver.wcs.WCSInfoImpl;
+import org.geoserver.wfs.WFSInfo;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -38,11 +39,6 @@ public class WCSSettingsResource extends ServiceSettingsResource {
     @Override
     protected DataFormat createHTMLFormat(Request request, Response response) {
         return new WCSSettingsHTMLFormat(request, response, this);
-    }
-
-    @Override
-    public boolean allowDelete() {
-        return false;
     }
 
     @Override

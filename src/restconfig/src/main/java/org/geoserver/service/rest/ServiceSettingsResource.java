@@ -11,6 +11,7 @@ import org.geoserver.config.GeoServer;
 import org.geoserver.config.ServiceInfo;
 import org.geoserver.ows.util.OwsUtils;
 import org.geoserver.rest.RestletException;
+import org.geoserver.wcs.WCSInfo;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -46,7 +47,12 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
 
     @Override
     public boolean allowDelete() {
-        return allowExisting();
+        String workspace = getAttribute("workspace");
+        if (workspace != null) {
+            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+            return geoServer.getService(ws, clazz) != null;
+        }
+        return false;
     }
 
     private boolean allowNew() {

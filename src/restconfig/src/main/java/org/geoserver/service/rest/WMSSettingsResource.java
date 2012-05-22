@@ -30,7 +30,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.Resource;
 
 import freemarker.ext.beans.CollectionModel;
-import freemarker.ext.beans.StringModel;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 
@@ -49,11 +48,6 @@ public class WMSSettingsResource extends ServiceSettingsResource {
     @Override
     protected DataFormat createHTMLFormat(Request request, Response response) {
         return new WMSSettingsHTMLFormat(request, response, this);
-    }
-
-    @Override
-    public boolean allowDelete() {
-        return false;
     }
 
     @Override
