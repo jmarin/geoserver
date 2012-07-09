@@ -1664,25 +1664,39 @@ Operations
 
 ``/services/wcs/settings[.<format>]``
 
+.. list-table::
+   :header-rows: 1
+
+
+
+   * - Method
+     - Action
+     - Return Code
+     - Formats
+     - Default Format
+   * - GET
      - Return global wcs settings
      - 200
-     - HTML, XML, JSON
+     - XML, JSON
      - HTML
    * - POST
-     - 
+     -
      - 405
-     -
-     -
+     - 
+     - 
    * - PUT
      - Modify global wcs settings
      - 200
-     - XML,JSON
+     - 
      - 
    * - DELETE
-     - 
+     -
      - 405
-     -
-     -
+     - 
+     - 
+
+
+
 
 *Representations*:
 
