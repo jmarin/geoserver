@@ -300,12 +300,12 @@ The default value is "false".
      - HTML, XML, JSON
      - HTML
    * - POST
-     - Creates new settings for workspace
-     - 201
-     - XML, JSON
+     - 
+     - 405
+     - 
      - 
    * - PUT
-     - Updates workspace settings
+     - Creates or updates workspace settings
      - 200
      - XML, JSON
      -
@@ -331,7 +331,7 @@ namespaces is identified by a prefix and a uri.
 
 .. note::
 
-   In GeoServer 1.7.x a namespace is used to group data stores, serving the 
+   In G<eoServer 1.7.x a namespace is used to group data stores, serving the 
    same purpose as a workspace. In 1.7.x the two are kept in sync. Therefore
    when adding a new namespace a workspace whose name matches the prefix of
    the namespace is implicitly created.
@@ -1722,12 +1722,12 @@ Operations
      - HTML, XML, JSON
      - HTML
    * - POST
-     - Add new wcs settings for workspace <ws>
-     - 201
+     - 
+     - 405
      -
      -
    * - PUT
-     - Modify wcs settings for workspace <ws>
+     - Create or modify wcs settings for workspace <ws>
      - 200
      - XML,JSON
      - 
@@ -1799,8 +1799,8 @@ Operations
      - HTML, XML, JSON
      - HTML
    * - POST
-     - Add new wfs settings for workspace <ws>
-     - 201
+     - 
+     - 405
      -
      -
    * - PUT
@@ -1876,8 +1876,8 @@ Operations
      - HTML, XML, JSON
      - HTML
    * - POST
-     - Add new wms settings for workspace <ws>
-     - 201
+     - 
+     - 405
      -
      -
    * - PUT
