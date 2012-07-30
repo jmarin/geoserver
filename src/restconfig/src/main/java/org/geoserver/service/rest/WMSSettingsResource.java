@@ -57,34 +57,6 @@ public class WMSSettingsResource extends ServiceSettingsResource {
         persister.getXStream().alias("class", WatermarkInfo.class, WatermarkInfoImpl.class);
     }
 
-    @Override
-    public String handleObjectPost(Object object) throws Exception {
-        String name = "";
-        ServiceInfo serviceInfo = handlePost(object);
-        if (serviceInfo instanceof WMSInfoImpl) {
-            WMSInfoImpl wmsInfo = (WMSInfoImpl) serviceInfo;
-            if (wmsInfo.getAuthorityURLs() == null) {
-                List<AuthorityURLInfo> authorityURLS = new ArrayList<AuthorityURLInfo>();
-                wmsInfo.setAuthorityURLs(authorityURLS);
-            }
-            if (wmsInfo.getIdentifiers() == null) {
-                List<LayerIdentifierInfo> identifiers = new ArrayList<LayerIdentifierInfo>();
-                wmsInfo.setIdentifiers(identifiers);
-            }
-            if (wmsInfo.getSRS() == null) {
-                List<String> srsList = new ArrayList<String>();
-                wmsInfo.setSRS(srsList);
-            }
-        }
-        name = serviceInfo.getName();
-        if (name == null) {
-            throw new RestletException("Service name cannot be null",
-                    Status.CLIENT_ERROR_BAD_REQUEST);
-        }
-        geoServer.add(serviceInfo);
-        return name;
-    }
-
     static class WMSSettingsHTMLFormat extends CatalogFreemarkerHTMLFormat {
 
         public WMSSettingsHTMLFormat(Request request, Response response, Resource resource) {

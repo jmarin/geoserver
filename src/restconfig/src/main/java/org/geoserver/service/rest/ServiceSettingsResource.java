@@ -36,13 +36,8 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
     }
 
     @Override
-    public boolean allowPost() {
-        return allowNew();
-    }
-
-    @Override
     public boolean allowPut() {
-        return allowExisting();
+        return true;
     }
 
     @Override
@@ -60,15 +55,6 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
         WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
         assert (ws != null);
         return geoServer.getService(ws, clazz) == null;
-    }
-
-    private boolean allowExisting() {
-        String workspace = getAttribute("workspace");
-        if (workspace != null) {
-            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
-            return geoServer.getService(ws, clazz) != null;
-        }
-        return geoServer.getService(clazz) != null;
     }
 
     @Override
@@ -90,52 +76,26 @@ public class ServiceSettingsResource extends AbstractCatalogResource {
     }
 
     @Override
-    protected String handleObjectPost(Object object) throws Exception {
-        String name = "";
-        ServiceInfo serviceInfo = handlePost(object);
-        name = serviceInfo.getName();
-        if (name == null) {
-            throw new RestletException("Service name cannot be null",
-                    Status.CLIENT_ERROR_BAD_REQUEST);
-        }
-        geoServer.add(serviceInfo);
-        return name;
-    }
-
-    protected ServiceInfo handlePost(Object object) {
-        String workspace = getAttribute("workspace");
-        if (workspace != null) {
-            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
-            if (ws == null) {
-                throw new RestletException("Workspace does not exist",
-                        Status.CLIENT_ERROR_BAD_REQUEST);
-            }
-            if (geoServer.getService(ws, clazz) != null) {
-                throw new RestletException(
-                        "Service information already exists, creation of a new object is not allowed",
-                        Status.CLIENT_ERROR_FORBIDDEN);
-            }
-            ServiceInfo serviceInfo = (ServiceInfo) object;
-            serviceInfo.setWorkspace(ws);
-            return serviceInfo;
-        }
-        return null;
-    }
-
-    @Override
     protected void handleObjectPut(Object object) throws Exception {
         String workspace = getAttribute("workspace");
+        WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
         ServiceInfo original = null;
         if (workspace != null) {
-            WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
-            original = geoServer.getService(ws, clazz);
-            OwsUtils.copy(object, original, clazz);
-            original.setWorkspace(ws);
+            if (geoServer.getService(ws, clazz) != null) { //object exists, this is an update
+                original = geoServer.getService(ws, clazz);
+                original.setWorkspace(ws);
+                OwsUtils.copy(object, original, clazz);
+                geoServer.save(original);
+            } else { //object does not exist, this creates it
+                ServiceInfo serviceInfo = (ServiceInfo) object;
+                serviceInfo.setWorkspace(ws);
+                geoServer.add(serviceInfo);
+            }
         } else {
             original = geoServer.getService(clazz);
+            OwsUtils.copy(object, original, clazz);
+            geoServer.save(original);
         }
-        OwsUtils.copy(object, original, clazz);
-        geoServer.save(original);
     }
 
     @Override

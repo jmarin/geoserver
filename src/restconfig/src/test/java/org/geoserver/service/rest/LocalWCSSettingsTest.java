@@ -57,12 +57,12 @@ public class LocalWCSSettingsTest extends CatalogRESTTestSupport {
         assertXpathEvaluatesTo("false", "/wcsinfo/verbose", dom);
     }
 
-    public void testPostAsJSON() throws Exception {
+    public void testCreateAsJSON() throws Exception {
         removeLocalWorkspace();
         String input = "{'wcsinfo': {'id' : 'wcs', 'name' : 'WCS', 'workspace': {'name': 'sf'},'enabled': 'true'}}";
-        MockHttpServletResponse response = postAsServletResponse("/rest/services/wcs/sf/settings/",
+        MockHttpServletResponse response = putAsServletResponse("/rest/services/wcs/sf/settings/",
                 input, "text/json");
-        assertEquals(201, response.getStatusCode());
+        assertEquals(200, response.getStatusCode());
         JSON json = getAsJSON("/rest/services/wcs/sf/settings.json");
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
@@ -74,14 +74,14 @@ public class LocalWCSSettingsTest extends CatalogRESTTestSupport {
         assertEquals("sf", workspace.get("name"));
     }
 
-    public void testPostAsXML() throws Exception {
+    public void testCreateAsXML() throws Exception {
         removeLocalWorkspace();
         String xml = "<wcsinfo>" + "<id>wcs</id>" + "<workspace>" + "<name>sf</name>"
                 + "</workspace>" + "<name>OGC:WCS</name>" + "<enabled>false</enabled>"
                 + "</wcsinfo>";
-        MockHttpServletResponse response = postAsServletResponse("/rest/services/wcs/sf/settings",
+        MockHttpServletResponse response = putAsServletResponse("/rest/services/wcs/sf/settings",
                 xml, "text/xml");
-        assertEquals(201, response.getStatusCode());
+        assertEquals(200, response.getStatusCode());
 
         Document dom = getAsDOM("/rest/services/wcs/sf/settings.xml");
         assertEquals("wcsinfo", dom.getDocumentElement().getLocalName());

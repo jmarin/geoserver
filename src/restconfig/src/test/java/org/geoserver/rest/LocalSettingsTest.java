@@ -68,7 +68,7 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
         assertXpathEvaluatesTo("Andrea Aime", "/settings/contact/contactPerson", dom);
     }
 
-    public void testPostAsJSON() throws Exception {
+    public void testCreateAsJSON() throws Exception {
         geoServer.remove(geoServer.getSettings(geoServer.getCatalog().getWorkspaceByName("sf")));
         String json = "{'settings':{'workspace':{'name':'sf'},"
                 + "'contact':{'addressCity':'Alexandria','addressCountry':'Egypt','addressType':'Work',"
@@ -76,9 +76,9 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
                 + "'contactPerson':'Claudius Ptolomaeus','contactPosition':'Chief geographer'},"
                 + "'charset':'UTF-8','numDecimals':10,'onlineResource':'http://geoserver.org',"
                 + "'proxyBaseUrl':'http://proxy.url','verbose':false,'verboseExceptions':'true'}}";
-        MockHttpServletResponse response = postAsServletResponse("/rest/workspaces/sf/settings",
+        MockHttpServletResponse response = putAsServletResponse("/rest/workspaces/sf/settings",
                 json, "text/json");
-        assertEquals(201, response.getStatusCode());
+        assertEquals(200, response.getStatusCode());
         JSON jsonMod = getAsJSON("/rest/workspaces/sf/settings.json");
         JSONObject jsonObject = (JSONObject) jsonMod;
         assertNotNull(jsonObject);
@@ -98,7 +98,7 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
 
     }
 
-    public void testPostAsXML() throws Exception {
+    public void testCreateAsXML() throws Exception {
         geoServer.remove(geoServer.getSettings(geoServer.getCatalog().getWorkspaceByName("sf")));
         String xml = "<settings>" + "<workspace><name>sf</name></workspace>" + "<contact>"
                 + "<addressCity>Alexandria</addressCity>"
@@ -112,9 +112,9 @@ public class LocalSettingsTest extends CatalogRESTTestSupport {
                 + "<proxyBaseUrl>http://proxy.url</proxyBaseUrl>"
                 + "<verbose>false</verbose>" + "<verboseExceptions>false</verboseExceptions>"
                 + "</settings>";
-        MockHttpServletResponse response = postAsServletResponse("/rest/workspaces/sf/settings",
+        MockHttpServletResponse response = putAsServletResponse("/rest/workspaces/sf/settings",
                 xml, "text/xml");
-        assertEquals(201, response.getStatusCode());
+        assertEquals(200, response.getStatusCode());
 
         Document dom = getAsDOM("/rest/workspaces/sf/settings.xml");
         assertEquals("settings", dom.getDocumentElement().getLocalName());

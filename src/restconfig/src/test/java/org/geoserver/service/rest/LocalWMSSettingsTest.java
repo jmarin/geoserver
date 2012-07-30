@@ -60,12 +60,12 @@ public class LocalWMSSettingsTest extends CatalogRESTTestSupport {
         assertXpathEvaluatesTo("Nearest", "/wmsinfo/interpolation", dom);
     }
 
-    public void testPostAsJSON() throws Exception {
+    public void testCreateAsJSON() throws Exception {
         removeLocalWorkspace();
         String input = "{'wmsinfo': {'id' : 'wms_sf', 'workspace':{'name':'sf'},'name' : 'WMS', 'enabled': 'true'}}";
-        MockHttpServletResponse response = postAsServletResponse("/rest/services/wms/sf/settings/",
+        MockHttpServletResponse response = putAsServletResponse("/rest/services/wms/sf/settings/",
                 input, "text/json");
-        assertEquals(201, response.getStatusCode());
+        assertEquals(200, response.getStatusCode());
         JSON json = getAsJSON("/rest/services/wms/sf/settings.json");
         JSONObject jsonObject = (JSONObject) json;
         assertNotNull(jsonObject);
@@ -78,14 +78,14 @@ public class LocalWMSSettingsTest extends CatalogRESTTestSupport {
         assertEquals("sf", workspace.get("name"));
     }
 
-    public void testPostAsXML() throws Exception {
+    public void testCreateAsXML() throws Exception {
         removeLocalWorkspace();
         String xml = "<wmsinfo>" + "<id>wms_sf</id>" + "<workspace>" + "<name>sf</name>"
                 + "</workspace>" + "<name>OGC:WMS</name>" + "<enabled>false</enabled>"
                 + "<interpolation>Nearest</interpolation>" + "</wmsinfo>";
-        MockHttpServletResponse response = postAsServletResponse("/rest/services/wms/sf/settings",
+        MockHttpServletResponse response = putAsServletResponse("/rest/services/wms/sf/settings",
                 xml, "text/xml");
-        assertEquals(201, response.getStatusCode());
+        assertEquals(200, response.getStatusCode());
 
         Document dom = getAsDOM("/rest/services/wms/sf/settings.xml");
         assertEquals("wmsinfo", dom.getDocumentElement().getLocalName());

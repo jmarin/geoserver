@@ -47,13 +47,8 @@ public class LocalSettingsResource extends AbstractCatalogResource {
     }
 
     @Override
-    public boolean allowPost() {
-        return allowNew();
-    }
-
-    @Override
     public boolean allowPut() {
-        return allowExisting();
+        return true;
     }
 
     @Override
@@ -61,19 +56,13 @@ public class LocalSettingsResource extends AbstractCatalogResource {
         return allowExisting();
     }
 
-    private boolean allowNew() {
-        String workspace = getAttribute("workspace");
-        WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
-        return geoServer.getSettings(ws) == null;
-    }
-
     private boolean allowExisting() {
         String workspace = getAttribute("workspace");
-        if (workspace != null) {
-            WorkspaceInfo workspaceInfo = geoServer.getCatalog().getWorkspaceByName(workspace);
-            return geoServer.getSettings(workspaceInfo) != null;
+        WorkspaceInfo ws = geoServer.getCatalog().getWorkspaceByName(workspace);
+        if (ws != null) {
+            return geoServer.getSettings(ws) != null;
         }
-        return false;
+        return geoServer.getSettings(ws) == null;
     }
 
     @Override
@@ -109,15 +98,21 @@ public class LocalSettingsResource extends AbstractCatalogResource {
     }
 
     @Override
-    protected void handleObjectPut(Object object) throws Exception {
+    protected void handleObjectPut(Object obj) throws Exception {
         String workspace = getAttribute("workspace");
         if (workspace != null) {
             WorkspaceInfo workspaceInfo = catalog.getWorkspaceByName(workspace);
-            SettingsInfo settingsInfo = (SettingsInfo) object;
+            SettingsInfo settingsInfo = (SettingsInfo) obj;
             SettingsInfo original = geoServer.getSettings(workspaceInfo);
-            OwsUtils.copy(settingsInfo, original, SettingsInfo.class);
-            original.setWorkspace(workspaceInfo);
-            geoServer.save(original);
+            if (original == null) {
+                settingsInfo.setWorkspace(workspaceInfo);
+                geoServer.add(settingsInfo);
+                geoServer.save(geoServer.getSettings(workspaceInfo));
+            } else {
+                OwsUtils.copy(settingsInfo, original, SettingsInfo.class);
+                original.setWorkspace(workspaceInfo);
+                geoServer.save(original);
+            }
         }
     }
 
